@@ -19,13 +19,21 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
     quote do
       if unquote(__MODULE__).included?(:index, options) do
         unquote(__MODULE__).index(
-          name, filter_type, sort_type, base_module, options
+          name,
+          filter_type,
+          sort_type,
+          base_module,
+          options
         )
       end
 
       if unquote(__MODULE__).included?(:show, options) do
         unquote(__MODULE__).show(
-          name, filter_type, sort_type, base_module, options
+          name,
+          filter_type,
+          sort_type,
+          base_module,
+          options
         )
       end
     end
@@ -36,20 +44,26 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       unquote(__MODULE__.action_name(name, :index, options)),
       unquote(__MODULE__.result_name(name, :list))
     ) do
-      arg :filter, list_of(unquote(filter_type))
-      arg :sorting, unquote(sort_type)
-      arg :pagination, :pagination_input
+      arg(:filter, list_of(unquote(filter_type)))
+      arg(:sorting, unquote(sort_type))
+      arg(:pagination, :pagination_input)
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:index, :before, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
-      resolve &Module.concat(unquote(base_module), Index).call/3
-      middleware PapaPal.Web.API.Middleware.HandleErrors
+
+      resolve(&Module.concat(unquote(base_module), Index).call/3)
+      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+
       unquote(
         for mw <- __MODULE__.extract_middleware(:index, :after, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
     end
@@ -60,18 +74,24 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       unquote(__MODULE__.action_name(name, :show, options)),
       unquote(__MODULE__.result_name(name, :single))
     ) do
-      arg :id, non_null(:id)
+      arg(:id, non_null(:id))
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:show, :before, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
-      resolve &Module.concat(unquote(base_module), Show).call/3
-      middleware PapaPal.Web.API.Middleware.HandleErrors
+
+      resolve(&Module.concat(unquote(base_module), Show).call/3)
+      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+
       unquote(
         for mw <- __MODULE__.extract_middleware(:show, :after, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
     end
@@ -113,18 +133,24 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       unquote(__MODULE__.action_name(name, :create, options)),
       unquote(__MODULE__.result_name(name, :single))
     ) do
-      arg :input, non_null(unquote(input_type))
+      arg(:input, non_null(unquote(input_type)))
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:create, :before, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
-      resolve &Module.concat(unquote(base_module), Create).call/3
-      middleware PapaPal.Web.API.Middleware.HandleErrors
+
+      resolve(&Module.concat(unquote(base_module), Create).call/3)
+      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+
       unquote(
         for mw <- __MODULE__.extract_middleware(:create, :after, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
     end
@@ -135,19 +161,25 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       unquote(__MODULE__.action_name(name, :update, options)),
       unquote(__MODULE__.result_name(name, :single))
     ) do
-      arg :id, non_null(:id)
-      arg :input, non_null(unquote(input_type))
+      arg(:id, non_null(:id))
+      arg(:input, non_null(unquote(input_type)))
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:update, :before, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
-      resolve &Module.concat(unquote(base_module), Update).call/3
-      middleware PapaPal.Web.API.Middleware.HandleErrors
+
+      resolve(&Module.concat(unquote(base_module), Update).call/3)
+      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+
       unquote(
         for mw <- __MODULE__.extract_middleware(:update, :after, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
     end
@@ -158,18 +190,24 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       unquote(__MODULE__.action_name(name, :destroy, options)),
       unquote(__MODULE__.result_name(name, :single))
     ) do
-      arg :id, non_null(:id)
+      arg(:id, non_null(:id))
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:destroy, :before, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
-      resolve &Module.concat(unquote(base_module), Destroy).call/3
-      middleware PapaPal.Web.API.Middleware.HandleErrors
+
+      resolve(&Module.concat(unquote(base_module), Destroy).call/3)
+      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+
       unquote(
         for mw <- __MODULE__.extract_middleware(:destroy, :after, options) do
-          quote do middleware(unquote(mw)) end
+          quote do
+            middleware(unquote(mw))
+          end
         end
       )
     end
@@ -188,13 +226,13 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   defmacro result_types(name, type) do
     quote do
       object(unquote(__MODULE__.result_name(name, :list))) do
-        field :data, list_of(unquote(type))
-        field :pagination, :pagination
+        field(:data, list_of(unquote(type)))
+        field(:pagination, :pagination)
       end
 
       object(unquote(__MODULE__.result_name(name, :single))) do
-        field :data, unquote(type)
-        field :pagination, :pagination
+        field(:data, unquote(type))
+        field(:pagination, :pagination)
       end
     end
   end
@@ -202,10 +240,10 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   defmacro filter_enum_input(enum) do
     quote do
       input_object unquote(String.to_atom("filter_#{enum}_input")) do
-        field :eq, unquote(enum)
-        field :ne, unquote(enum)
-        field :in, list_of(unquote(enum))
-        field :not_in, list_of(unquote(enum))
+        field(:eq, unquote(enum))
+        field(:ne, unquote(enum))
+        field(:in, list_of(unquote(enum)))
+        field(:not_in, list_of(unquote(enum)))
       end
     end
   end
@@ -247,9 +285,11 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   def action_name(name, :show, options) do
     extract_action_name(:show, options) || name
   end
+
   def action_name(name, :index, options) do
     extract_action_name(:index, options) || index_name(name)
   end
+
   def action_name(name, action, options) do
     extract_action_name(action, options) || String.to_atom("#{action}_#{name}")
   end
