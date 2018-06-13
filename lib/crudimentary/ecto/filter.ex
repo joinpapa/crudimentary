@@ -2,17 +2,21 @@ defmodule CRUDimentary.Ecto.Filter do
   import Ecto.Query
 
   def call(queriable, [], _, _), do: queriable
+
   def call(queriable, filters, mapping, custom_filters) when is_list(filters) do
     dynamic =
       Enum.reduce(
         filters,
         dynamic([q], 1 == 0),
-        &(build_filter(&1, &2, mapping, custom_filters))
+        &build_filter(&1, &2, mapping, custom_filters)
       )
 
-    from queriable,
+    from(
+      queriable,
       where: ^dynamic
+    )
   end
+
   def call(queriable, _, _, _), do: queriable
 
   defp build_filter(filter_input, dynamic, mapping, filters) do
@@ -27,7 +31,7 @@ defmodule CRUDimentary.Ecto.Filter do
       Enum.reduce(
         filter_input,
         dynamic([q], 1 == 1),
-        &(process_filter_attribute(&1, &2, mapping, filters))
+        &process_filter_attribute(&1, &2, mapping, filters)
       )
     else
       dynamic([q], 1 == 0)
@@ -35,26 +39,27 @@ defmodule CRUDimentary.Ecto.Filter do
   end
 
   defp process_filter_attribute(
-    {attribute, input},
-    acc_dynamic,
-    mapping,
-    filters
-  ) do
+         {attribute, input},
+         acc_dynamic,
+         mapping,
+         filters
+       ) do
     Enum.reduce(
       input,
       acc_dynamic,
-      &(build_dynamic_matcher(attribute, &1, &2, mapping, filters))
+      &build_dynamic_matcher(attribute, &1, &2, mapping, filters)
     )
   end
 
   defp build_dynamic_matcher(
-    attribute,
-    {matcher, value},
-    dynamic,
-    mapping,
-    filters
-  ) do
+         attribute,
+         {matcher, value},
+         dynamic,
+         mapping,
+         filters
+       ) do
     attribute = resolve_attribute(attribute, mapping)
+
     case matcher do
       :null ->
         if value do
@@ -62,6 +67,7 @@ defmodule CRUDimentary.Ecto.Filter do
         else
           dynamic([e], ^dynamic and not is_nil(field(e, ^attribute)))
         end
+
       :eq ->
         if value do
           dynamic([e], ^dynamic and field(e, ^attribute) == ^value)
@@ -74,6 +80,7 @@ defmodule CRUDimentary.Ecto.Filter do
             filters
           )
         end
+
       :ne ->
         if value do
           dynamic([e], ^dynamic and field(e, ^attribute) != ^value)
@@ -86,19 +93,34 @@ defmodule CRUDimentary.Ecto.Filter do
             filters
           )
         end
+
       :cont ->
         dynamic([e], ^dynamic and ilike(field(e, ^attribute), ^"%#{value}%"))
+
       :not_cont ->
         dynamic(
           [e],
           ^dynamic and not ilike(field(e, ^attribute), ^"%#{value}%")
         )
-      :gt -> dynamic([e], ^dynamic and field(e, ^attribute) > ^value)
-      :gte -> dynamic([e], ^dynamic and field(e, ^attribute) >= ^value)
-      :lt -> dynamic([e], ^dynamic and field(e, ^attribute) < ^value)
-      :lte -> dynamic([e], ^dynamic and field(e, ^attribute) <= ^value)
-      :in -> dynamic([e], ^dynamic and field(e, ^attribute) in ^value)
-      :not_in -> dynamic([e], ^dynamic and  field(e, ^attribute) not in ^value)
+
+      :gt ->
+        dynamic([e], ^dynamic and field(e, ^attribute) > ^value)
+
+      :gte ->
+        dynamic([e], ^dynamic and field(e, ^attribute) >= ^value)
+
+      :lt ->
+        dynamic([e], ^dynamic and field(e, ^attribute) < ^value)
+
+      :lte ->
+        dynamic([e], ^dynamic and field(e, ^attribute) <= ^value)
+
+      :in ->
+        dynamic([e], ^dynamic and field(e, ^attribute) in ^value)
+
+      :not_in ->
+        dynamic([e], ^dynamic and field(e, ^attribute) not in ^value)
+
       _ ->
         extract_custom_filter(filters, attribute, matcher).(
           attribute,
@@ -115,11 +137,12 @@ defmodule CRUDimentary.Ecto.Filter do
       attribute
     end
   end
+
   defp resolve_attribute(attribute, _), do: attribute
 
   defp extract_custom_filter(filters, attribute, matcher) do
     filters = filters || %{}
     filters = filters[attribute] || %{}
-    filters[matcher] || fn (_, _, dynamic) -> dynamic end
+    filters[matcher] || fn _, _, dynamic -> dynamic end
   end
 end

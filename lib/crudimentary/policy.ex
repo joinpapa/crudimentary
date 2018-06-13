@@ -9,7 +9,7 @@ defmodule CRUDimentary.Policy do
   end
 
   def authorized?(action, current_account) do
-    authorize(action, nil, current_account)
+    authorized?(action, nil, current_account)
   end
 
   def authorized?(action, record, current_account) do

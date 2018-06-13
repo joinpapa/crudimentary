@@ -12,15 +12,16 @@ defmodule CRUDimentary.Absinthe.Plugs.RequestCache do
         _ -> nil
       end
 
-    conn = put_private(
-      conn,
-      :absinthe,
-      %{
-        context: %{
-          cache: cache
+    conn =
+      put_private(
+        conn,
+        :absinthe,
+        %{
+          context: %{
+            cache: cache
+          }
         }
-      }
-    )
+      )
 
     Plug.Conn.register_before_send(
       conn,

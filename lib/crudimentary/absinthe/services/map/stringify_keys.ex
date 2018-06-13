@@ -8,6 +8,7 @@ defmodule CRUDimentary.Absinthe.Services.Map.StringifyKeys do
   end
 
   defp stringify_keys(nil), do: nil
+
   defp stringify_keys(map) when is_map(map) do
     if is_struct?(map) do
       map
@@ -15,6 +16,7 @@ defmodule CRUDimentary.Absinthe.Services.Map.StringifyKeys do
       stringify_map_keys(map)
     end
   end
+
   defp stringify_keys(other), do: other
 
   defp stringify_map_keys(map) do

@@ -1,23 +1,20 @@
-defmodule CRUDimentary.Absinthe.Respolvers.Generic.Update do
-  import CRUDimentary.Absinthe.Respolvers.Generic
+defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
+  import CRUDimentary.Absinthe.Resolvers.Generic
 
   def call(schema, current_account, parent, args, resolution, options) do
-    with \
-      repo <- options[:repo],
-      {:resource, %schema{} = resource} <-
-        {:resource, Repo.get(schema, args[:id])},
-      policy <- policy_module(schema),
-      params <-
-        apply_mapping(args[:input], options[:mapping])
-        |> permitted_params(policy),
-      changeset <-
-        apply(
-          schema,
-          options[:changeset_function] || :changeset,
-          [resource, params]
-        ),
-      {:ok, updated_resource} <- repo.update(changeset)
-    do
+    with repo <- options[:repo],
+         {:resource, %schema{} = resource} <- {:resource, Repo.get(schema, args[:id])},
+         policy <- options[:policy],
+         params <-
+           apply_mapping(args[:input], options[:mapping])
+           |> permitted_params(policy),
+         changeset <-
+           apply(
+             schema,
+             options[:changeset_function] || :changeset,
+             [resource, params]
+           ),
+         {:ok, updated_resource} <- repo.update(changeset) do
       {
         :ok,
         %{

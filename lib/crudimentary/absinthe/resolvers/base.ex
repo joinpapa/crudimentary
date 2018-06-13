@@ -1,4 +1,4 @@
-defmodule CRUDimentary.Absinthe.Respolvers.Base do
+defmodule CRUDimentary.Absinthe.Resolvers.Base do
   defmacro __using__(_) do
     quote do
       @current_account_cache_key :current_account
@@ -31,6 +31,7 @@ defmodule CRUDimentary.Absinthe.Respolvers.Base do
 
       defp cache_get(resolution, key) do
         agent = get_agent(resolution)
+
         if agent do
           Cache.get(agent, key)
         else
@@ -40,6 +41,7 @@ defmodule CRUDimentary.Absinthe.Respolvers.Base do
 
       defp cache_set(resolution, key, value) do
         agent = get_agent(resolution)
+
         if agent do
           Cache.set(agent, key, value)
         else
@@ -49,6 +51,7 @@ defmodule CRUDimentary.Absinthe.Respolvers.Base do
 
       defp cache_delete(resolution, key) do
         agent = get_agent(resolution)
+
         if agent do
           Cache.delete(agent, key)
         else

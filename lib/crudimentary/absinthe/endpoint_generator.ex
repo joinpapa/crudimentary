@@ -40,60 +40,64 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   defmacro index(name, filter_type, sort_type, base_module, options \\ %{}) do
-    field(
-      unquote(__MODULE__.action_name(name, :index, options)),
-      unquote(__MODULE__.result_name(name, :list))
-    ) do
-      arg(:filter, list_of(unquote(filter_type)))
-      arg(:sorting, unquote(sort_type))
-      arg(:pagination, :pagination_input)
+    quote do
+      field(
+        unquote(__MODULE__.action_name(name, :index, options)),
+        unquote(__MODULE__.result_name(name, :list))
+      ) do
+        arg(:filter, list_of(unquote(filter_type)))
+        arg(:sorting, unquote(sort_type))
+        arg(:pagination, :pagination_input)
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:index, :before, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:index, :before, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
 
-      resolve(&Module.concat(unquote(base_module), Index).call/3)
-      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
+        resolve(&Module.concat(unquote(base_module), Index).call/3)
+        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:index, :after, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:index, :after, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
+      end
     end
   end
 
   defmacro show(name, filter_type, sort_type, base_module, options \\ %{}) do
-    field(
-      unquote(__MODULE__.action_name(name, :show, options)),
-      unquote(__MODULE__.result_name(name, :single))
-    ) do
-      arg(:id, non_null(:id))
+    quote do
+      field(
+        unquote(__MODULE__.action_name(name, :show, options)),
+        unquote(__MODULE__.result_name(name, :single))
+      ) do
+        arg(:id, non_null(:id))
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:show, :before, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:show, :before, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
 
-      resolve(&Module.concat(unquote(base_module), Show).call/3)
-      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
+        resolve(&Module.concat(unquote(base_module), Show).call/3)
+        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:show, :after, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:show, :after, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
+      end
     end
   end
 
@@ -129,87 +133,93 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   defmacro create(name, input_type, base_module, options \\ %{}) do
-    field(
-      unquote(__MODULE__.action_name(name, :create, options)),
-      unquote(__MODULE__.result_name(name, :single))
-    ) do
-      arg(:input, non_null(unquote(input_type)))
+    quote do
+      field(
+        unquote(__MODULE__.action_name(name, :create, options)),
+        unquote(__MODULE__.result_name(name, :single))
+      ) do
+        arg(:input, non_null(unquote(input_type)))
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:create, :before, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:create, :before, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
 
-      resolve(&Module.concat(unquote(base_module), Create).call/3)
-      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
+        resolve(&Module.concat(unquote(base_module), Create).call/3)
+        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:create, :after, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:create, :after, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
+      end
     end
   end
 
   defmacro update(name, input_type, base_module, options \\ %{}) do
-    field(
-      unquote(__MODULE__.action_name(name, :update, options)),
-      unquote(__MODULE__.result_name(name, :single))
-    ) do
-      arg(:id, non_null(:id))
-      arg(:input, non_null(unquote(input_type)))
+    quote do
+      field(
+        unquote(__MODULE__.action_name(name, :update, options)),
+        unquote(__MODULE__.result_name(name, :single))
+      ) do
+        arg(:id, non_null(:id))
+        arg(:input, non_null(unquote(input_type)))
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:update, :before, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:update, :before, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
 
-      resolve(&Module.concat(unquote(base_module), Update).call/3)
-      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
+        resolve(&Module.concat(unquote(base_module), Update).call/3)
+        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:update, :after, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:update, :after, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
+      end
     end
   end
 
   defmacro destroy(name, input_type, base_module, options \\ %{}) do
-    field(
-      unquote(__MODULE__.action_name(name, :destroy, options)),
-      unquote(__MODULE__.result_name(name, :single))
-    ) do
-      arg(:id, non_null(:id))
+    quote do
+      field(
+        unquote(__MODULE__.action_name(name, :destroy, options)),
+        unquote(__MODULE__.result_name(name, :single))
+      ) do
+        arg(:id, non_null(:id))
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:destroy, :before, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:destroy, :before, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
 
-      resolve(&Module.concat(unquote(base_module), Destroy).call/3)
-      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
+        resolve(&Module.concat(unquote(base_module), Destroy).call/3)
+        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
-      unquote(
-        for mw <- __MODULE__.extract_middleware(:destroy, :after, options) do
-          quote do
-            middleware(unquote(mw))
+        unquote(
+          for mw <- __MODULE__.extract_middleware(:destroy, :after, options) do
+            quote do
+              middleware(unquote(mw))
+            end
           end
-        end
-      )
+        )
+      end
     end
   end
 
@@ -262,8 +272,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   def extract_middleware(action, position, options) do
-    (options[action][:middleware][position] || []) ++
-      (options[:middleware][position] || [])
+    (options[action][:middleware][position] || []) ++ (options[:middleware][position] || [])
   end
 
   def result_name(name, count) do
