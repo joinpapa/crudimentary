@@ -1,14 +1,14 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Generic.Destroy do
   import CRUDimentary.Absinthe.Resolvers.Generic
 
-  def call(schema, current_account, _parent, args, _resolution, options) do
+  def call(_schema, current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],
          policy <- options[:policy],
          resource <- repo.get_by(id: args[:id]),
          {:authorized, true} <-
            {:authorized, authorized?(policy, resource, current_account, :destroy)},
          {:resource, false} <- {:resource, is_nil(resource)},
-         {:destroy, {:ok, result}} <- {:destroy, repo.delete(resource)} do
+         {:destroy, {:ok, _}} <- {:destroy, repo.delete(resource)} do
       result(resource)
     else
       {:authorized, _} -> {:error, :unauthorized}

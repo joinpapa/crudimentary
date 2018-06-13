@@ -1,9 +1,9 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
   import CRUDimentary.Absinthe.Resolvers.Generic
 
-  def call(schema, current_account, parent, args, resolution, options) do
+  def call(schema, _current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],
-         {:resource, %schema{} = resource} <- {:resource, Repo.get(schema, args[:id])},
+         {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
          policy <- options[:policy],
          params <-
            apply_mapping(args[:input], options[:mapping])
@@ -22,7 +22,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
         }
       }
     else
-      {:resource, _} -> Errors.no_resource()
+      {:resource, _} -> {:error, :no_resource}
       {:error, _, changeset, _} -> {:error, changeset}
       {:error, error} -> {:error, error}
       error -> {:error, error}

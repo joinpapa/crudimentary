@@ -16,7 +16,13 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   defmacro query(name, filter_type, sort_type, base_module, options \\ %{}) do
-    quote do
+    quote bind_quoted: [
+            name: name,
+            filter_type: filter_type,
+            sort_type: sort_type,
+            base_module: base_module,
+            options: options
+          ] do
       if unquote(__MODULE__).included?(:index, options) do
         unquote(__MODULE__).index(
           name,
@@ -71,7 +77,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
     end
   end
 
-  defmacro show(name, filter_type, sort_type, base_module, options \\ %{}) do
+  defmacro show(name, _filter_type, _sort_type, base_module, options \\ %{}) do
     quote do
       field(
         unquote(__MODULE__.action_name(name, :show, options)),
@@ -117,7 +123,12 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   defmacro mutation(name, input_type, base_module, options \\ %{}) do
-    quote do
+    quote bind_quoted: [
+            name: name,
+            input_type: input_type,
+            base_module: base_module,
+            options: options
+          ] do
       if unquote(__MODULE__).included?(:create, options) do
         unquote(__MODULE__).create(name, input_type, base_module, options)
       end
@@ -135,7 +146,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   defmacro create(name, input_type, base_module, options \\ %{}) do
     quote do
       field(
-        unquote(__MODULE__.action_name(name, :create, options)),
+        unquote(__MODULE__).action_name(name, :create, options),
         unquote(__MODULE__.result_name(name, :single))
       ) do
         arg(:input, non_null(unquote(input_type)))
@@ -193,7 +204,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
     end
   end
 
-  defmacro destroy(name, input_type, base_module, options \\ %{}) do
+  defmacro destroy(name, _input_type, base_module, options \\ %{}) do
     quote do
       field(
         unquote(__MODULE__.action_name(name, :destroy, options)),

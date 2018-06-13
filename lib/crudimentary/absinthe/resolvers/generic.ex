@@ -45,7 +45,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic do
   ## IMPLEMENTATION
   ##
 
-  def scope_module(schema, policy) do
+  def scope_module(_schema, policy) do
     if function_exported?(policy, :scope, 2) do
       policy
     else
