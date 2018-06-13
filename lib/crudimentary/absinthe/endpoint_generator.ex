@@ -57,7 +57,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       )
 
       resolve(&Module.concat(unquote(base_module), Index).call/3)
-      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:index, :after, options) do
@@ -85,7 +85,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       )
 
       resolve(&Module.concat(unquote(base_module), Show).call/3)
-      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:show, :after, options) do
@@ -144,7 +144,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       )
 
       resolve(&Module.concat(unquote(base_module), Create).call/3)
-      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:create, :after, options) do
@@ -173,7 +173,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       )
 
       resolve(&Module.concat(unquote(base_module), Update).call/3)
-      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:update, :after, options) do
@@ -201,7 +201,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
       )
 
       resolve(&Module.concat(unquote(base_module), Destroy).call/3)
-      middleware(PapaPal.Web.API.Middleware.HandleErrors)
+      middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
       unquote(
         for mw <- __MODULE__.extract_middleware(:destroy, :after, options) do
