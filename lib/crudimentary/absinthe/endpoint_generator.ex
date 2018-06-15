@@ -1,230 +1,110 @@
 defmodule CRUDimentary.Absinthe.EndpointGenerator do
-  #############
-  ## QUERIES ##
-  #############
+  #########################
+  ## QUERIES / MUTATIONS ##
+  #########################
+
+  @query_types [:index, :show]
+  @mutation_types [:create, :update, :destroy]
 
   defmacro generic_query(name, base_module, options \\ %{}) do
-    quote do
-      unquote(__MODULE__).query(
-        unquote(name),
-        String.to_atom("#{unquote(name)}_filter"),
-        String.to_atom("#{unquote(name)}_sorting"),
-        unquote(base_module),
-        unquote(options)
-      )
-    end
-  end
-
-  defmacro query(name, filter_type, sort_type, base_module, options \\ %{}) do
-    quote bind_quoted: [
-            name: name,
-            filter_type: filter_type,
-            sort_type: sort_type,
-            base_module: base_module,
-            options: options
-          ] do
-      if unquote(__MODULE__).included?(:index, options) do
-        unquote(__MODULE__).index(
-          name,
-          filter_type,
-          sort_type,
-          base_module,
-          options
-        )
-      end
-
-      if unquote(__MODULE__).included?(:show, options) do
-        unquote(__MODULE__).show(
-          name,
-          filter_type,
-          sort_type,
-          base_module,
-          options
-        )
+    for query_type <- @query_types do
+      if included?(query_type, options) do
+        quote do
+          unquote(__MODULE__).generic_field(
+            unquote(query_type),
+            unquote(name),
+            nil,
+            String.to_atom("#{unquote(name)}_filter"),
+            String.to_atom("#{unquote(name)}_sorting"),
+            unquote(base_module),
+            unquote(options)
+          )
+        end
       end
     end
   end
-
-  defmacro index(name, filter_type, sort_type, base_module, options \\ %{}) do
-    quote do
-      field(
-        unquote(__MODULE__.action_name(name, :index, options)),
-        unquote(__MODULE__.result_name(name, :list))
-      ) do
-        arg(:filter, list_of(unquote(filter_type)))
-        arg(:sorting, unquote(sort_type))
-        arg(:pagination, :pagination_input)
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:index, :before, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-
-        resolve(&Module.concat(unquote(base_module), Index).call/3)
-        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:index, :after, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-      end
-    end
-  end
-
-  defmacro show(name, _filter_type, _sort_type, base_module, options \\ %{}) do
-    quote do
-      field(
-        unquote(__MODULE__.action_name(name, :show, options)),
-        unquote(__MODULE__.result_name(name, :single))
-      ) do
-        arg(:id, non_null(:id))
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:show, :before, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-
-        resolve(&Module.concat(unquote(base_module), Show).call/3)
-        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:show, :after, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-      end
-    end
-  end
-
-  ###############
-  ## MUTATIONS ##
-  ###############
 
   defmacro generic_mutation(name, base_module, options \\ %{}) do
-    quote do
-      unquote(__MODULE__).mutation(
-        unquote(name),
-        String.to_atom("#{unquote(name)}_input"),
-        unquote(base_module),
-        unquote(options)
-      )
-    end
-  end
-
-  defmacro mutation(name, input_type, base_module, options \\ %{}) do
-    quote bind_quoted: [
-            name: name,
-            input_type: input_type,
-            base_module: base_module,
-            options: options
-          ] do
-      if unquote(__MODULE__).included?(:create, options) do
-        unquote(__MODULE__).create(name, input_type, base_module, options)
-      end
-
-      if unquote(__MODULE__).included?(:update, options) do
-        unquote(__MODULE__).update(name, input_type, base_module, options)
-      end
-
-      if unquote(__MODULE__).included?(:destroy, options) do
-        unquote(__MODULE__).destroy(name, input_type, base_module, options)
+    for mutation_type <- @mutation_types do
+      if included?(mutation_type, options) do
+        quote do
+          unquote(__MODULE__).generic_field(
+            unquote(mutation_type),
+            unquote(name),
+            String.to_atom("#{unquote(name)}_input"),
+            nil,
+            nil,
+            unquote(base_module),
+            unquote(options)
+          )
+        end
       end
     end
   end
 
-  defmacro create(name, input_type, base_module, options \\ %{}) do
+  defmacro generic_field(
+             request_type,
+             name,
+             input_type,
+             filter_type,
+             sort_type,
+             base_module,
+             options
+           ) do
     quote do
       field(
-        unquote(__MODULE__).action_name(name, :create, options),
-        unquote(__MODULE__.result_name(name, :single))
+        unquote(action_name(name, request_type, options)),
+        unquote(
+          if request_type == :index do
+            result_name(name, :list)
+          else
+            result_name(name, :single)
+          end
+        )
       ) do
-        arg(:input, non_null(unquote(input_type)))
+        unquote(
+          case request_type do
+            :index ->
+              quote do
+                arg(:filter, list_of(unquote(filter_type)))
+                arg(:sorting, unquote(sort_type))
+                arg(:pagination, :pagination_input)
+              end
+
+            :create ->
+              quote do
+                arg(:input, non_null(unquote(input_type)))
+              end
+
+            :update ->
+              quote do
+                arg(:id, non_null(:id))
+                arg(:input, non_null(unquote(input_type)))
+              end
+
+            _ ->
+              quote do
+                arg(:id, non_null(:id))
+              end
+          end
+        )
 
         unquote(
-          for mw <- __MODULE__.extract_middleware(:create, :before, options) do
+          for mw <- extract_middleware(request_type, :before, options) do
             quote do
               middleware(unquote(mw))
             end
           end
         )
 
-        resolve(&Module.concat(unquote(base_module), Create).call/3)
+        resolve(
+          &Module.concat(unquote(base_module), unquote(capitalize_atom(request_type))).call/3
+        )
+
         middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
 
         unquote(
-          for mw <- __MODULE__.extract_middleware(:create, :after, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-      end
-    end
-  end
-
-  defmacro update(name, input_type, base_module, options \\ %{}) do
-    quote do
-      field(
-        unquote(__MODULE__.action_name(name, :update, options)),
-        unquote(__MODULE__.result_name(name, :single))
-      ) do
-        arg(:id, non_null(:id))
-        arg(:input, non_null(unquote(input_type)))
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:update, :before, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-
-        resolve(&Module.concat(unquote(base_module), Update).call/3)
-        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:update, :after, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-      end
-    end
-  end
-
-  defmacro destroy(name, _input_type, base_module, options \\ %{}) do
-    quote do
-      field(
-        unquote(__MODULE__.action_name(name, :destroy, options)),
-        unquote(__MODULE__.result_name(name, :single))
-      ) do
-        arg(:id, non_null(:id))
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:destroy, :before, options) do
-            quote do
-              middleware(unquote(mw))
-            end
-          end
-        )
-
-        resolve(&Module.concat(unquote(base_module), Destroy).call/3)
-        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
-
-        unquote(
-          for mw <- __MODULE__.extract_middleware(:destroy, :after, options) do
+          for mw <- extract_middleware(request_type, :after, options) do
             quote do
               middleware(unquote(mw))
             end
@@ -287,18 +167,16 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   def result_name(name, count) do
-    "#{name}_#{count}_result"
-    |> String.to_atom()
+    String.to_atom("#{name}_#{count}_result")
   end
 
   def filter_name(name) do
-    "#{name}_filter"
-    |> String.to_atom()
+    String.to_atom("#{name}_filter")
   end
 
   def index_name(name) do
-    # Hack to convert anything to a string
-    Inflex.pluralize("#{name}")
+    "#{name}"
+    |> Inflex.pluralize()
     |> String.to_atom()
   end
 
@@ -316,5 +194,12 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
 
   def extract_action_name(action, options) do
     options[:name][action]
+  end
+
+  def capitalize_atom(atom) do
+    atom
+    |> Atom.to_string()
+    |> String.capitalize()
+    |> String.to_atom()
   end
 end

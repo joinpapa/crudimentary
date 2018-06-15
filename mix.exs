@@ -22,7 +22,8 @@ defmodule CRUDimentary.MixProject do
       {:odgn_json_pointer, "~> 2.3"},
       {:inflex, "~> 1.10.0"},
       {:paginator, "~> 0.3"},
-      {:phoenix, ">= 0.0.0"}
+      {:phoenix, ">= 0.0.0"},
+      {:absinthe, "~> 1.4"}
     ]
   end
 end

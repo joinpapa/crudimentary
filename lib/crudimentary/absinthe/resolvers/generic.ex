@@ -9,24 +9,15 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic do
         alias CRUDimentary.Absinthe.Resolvers.Generic
 
         module =
-          case unquote(params[:action]) do
-            :index ->
-              Generic.Index
+          if unquote(params[:action]) in [:index, :show, :create, :update, :destory] do
+            submodule =
+              unquote(params[:action])
+              |> Atom.to_string()
+              |> String.capitalize()
 
-            :show ->
-              Generic.Show
-
-            :create ->
-              Generic.Create
-
-            :update ->
-              Generic.Update
-
-            :destroy ->
-              Generic.Destroy
-
-            _ ->
-              raise("Unknown action")
+            Module.concat(Generic, submodule)
+          else
+            raise("Unknown action")
           end
 
         module.call(

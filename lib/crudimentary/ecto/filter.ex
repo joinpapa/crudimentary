@@ -103,6 +103,18 @@ defmodule CRUDimentary.Ecto.Filter do
           ^dynamic and not ilike(field(e, ^attribute), ^"%#{value}%")
         )
 
+      :starts_with ->
+        dynamic(
+          [e],
+          ^dynamic and ilike(field(e, ^attribute), ^"#{value}%")
+        )
+
+      :ends_with ->
+        dynamic(
+          [e],
+          ^dynamic and ilike(field(e, ^attribute), ^"%#{value}")
+        )
+
       :gt ->
         dynamic([e], ^dynamic and field(e, ^attribute) > ^value)
 
