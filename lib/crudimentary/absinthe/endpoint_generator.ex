@@ -43,7 +43,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   defmacro generic_field(
-             request_type,
+             action_type,
              name,
              input_type,
              filter_type,
@@ -53,9 +53,9 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
            ) do
     quote do
       field(
-        unquote(action_name(name, request_type, options)),
+        unquote(action_name(name, action_type, options)),
         unquote(
-          if request_type == :index do
+          if action_type == :index do
             result_name(name, :list)
           else
             result_name(name, :single)
@@ -63,7 +63,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
         )
       ) do
         unquote(
-          case request_type do
+          case action_type do
             :index ->
               quote do
                 arg(:filter, list_of(unquote(filter_type)))
@@ -90,7 +90,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
         )
 
         unquote(
-          for mw <- extract_middleware(request_type, :before, options) do
+          for mw <- extract_middleware(action_type, :before, options) do
             quote do
               middleware(unquote(mw))
             end
@@ -98,13 +98,13 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
         )
 
         resolve(
-          &Module.concat(unquote(base_module), unquote(capitalize_atom(request_type))).call/3
+          &Module.concat(unquote(base_module), unquote(capitalize_atom(action_type))).call/3
         )
 
         middleware(DeliriumTremex.Middleware.HandleErrors)
 
         unquote(
-          for mw <- extract_middleware(request_type, :after, options) do
+          for mw <- extract_middleware(action_type, :after, options) do
             quote do
               middleware(unquote(mw))
             end
