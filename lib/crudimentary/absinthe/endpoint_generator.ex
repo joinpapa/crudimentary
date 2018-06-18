@@ -101,7 +101,7 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
           &Module.concat(unquote(base_module), unquote(capitalize_atom(request_type))).call/3
         )
 
-        middleware(CRUDimentary.Absinthe.Middleware.HandleErrors)
+        middleware(DeliriumTremex.Middleware.HandleErrors)
 
         unquote(
           for mw <- extract_middleware(request_type, :after, options) do
