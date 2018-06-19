@@ -1,9 +1,5 @@
 defmodule CRUDimentary.Absinthe.EndpointGenerator do
-  #########################
-  ## QUERIES / MUTATIONS ##
-  #########################
-
-  @query_types [:index, :show]
+  @query_types    [:index, :show]
   @mutation_types [:create, :update, :destroy]
 
   defmacro generic_query(name, base_module, options \\ %{}) do
@@ -43,80 +39,76 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   end
 
   defmacro generic_field(
-             action_type,
-             name,
-             input_type,
-             filter_type,
-             sort_type,
-             base_module,
-             options
-           ) do
+    action_type,
+    name,
+    input_type,
+    filter_type,
+    sort_type,
+    base_module,
+    options) do
     quote do
       field(
-        unquote(action_name(name, action_type, options)),
-        unquote(
-          if action_type == :index do
-            result_name(name, :list)
-          else
-            result_name(name, :single)
-          end
-        )
-      ) do
-        unquote(
-          case action_type do
-            :index ->
-              quote do
-                arg(:filter, list_of(unquote(filter_type)))
-                arg(:sorting, unquote(sort_type))
-                arg(:pagination, :pagination_input)
-              end
-
-            :create ->
-              quote do
-                arg(:input, non_null(unquote(input_type)))
-              end
-
-            :update ->
-              quote do
-                arg(:id, non_null(:id))
-                arg(:input, non_null(unquote(input_type)))
-              end
-
-            _ ->
-              quote do
-                arg(:id, non_null(:id))
-              end
-          end
-        )
-
-        unquote(
-          for mw <- extract_middleware(action_type, :before, options) do
+      unquote(action_name(name, action_type, options)),
+      unquote(
+        if action_type == :index do
+          result_name(name, :list)
+        else
+          result_name(name, :single)
+        end
+      )
+    ) do
+      unquote(
+        case action_type do
+          :index ->
             quote do
-              middleware(unquote(mw))
+              arg(:filter, list_of(unquote(filter_type)))
+              arg(:sorting, unquote(sort_type))
+              arg(:pagination, :pagination_input)
             end
-          end
-        )
-
-        resolve(
-          &Module.concat(unquote(base_module), unquote(capitalize_atom(action_type))).call/3
-        )
-
-        middleware(DeliriumTremex.Middleware.HandleErrors)
-
-        unquote(
-          for mw <- extract_middleware(action_type, :after, options) do
+          :create ->
             quote do
-              middleware(unquote(mw))
+              arg(:input, non_null(unquote(input_type)))
             end
+          :update ->
+            quote do
+              arg(:id, non_null(:id))
+              arg(:input, non_null(unquote(input_type)))
+            end
+          _ ->
+            quote do
+              arg(:id, non_null(:id))
+            end
+        end
+      )
+
+      unquote(
+        for mw <- extract_middleware(action_type, :before, options) do
+          quote do
+            middleware(unquote(mw))
           end
-        )
+        end
+      )
+
+      resolve(&Module.concat(unquote(base_module), unquote(capitalize_atom(action_type))).call/3)
+
+      unquote(
+        if options[:error_handler] do
+          quote do
+            middleware(unquote(options[:error_handler]))
+          end
+        end
+      )
+
+      unquote(
+        for mw <- extract_middleware(action_type, :after, options) do
+          quote do
+            middleware(unquote(mw))
+          end
+        end
+      )
       end
     end
   end
-
-  ###########
-  ## TYPES ##
-  ###########
 
   defmacro generic_result_types(name) do
     quote do
@@ -149,10 +141,6 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
     end
   end
 
-  #############
-  ## HELPERS ##
-  #############
-
   def included?(action, options) do
     !excluded?(action, options)
   end
@@ -183,11 +171,9 @@ defmodule CRUDimentary.Absinthe.EndpointGenerator do
   def action_name(name, :show, options) do
     extract_action_name(:show, options) || name
   end
-
   def action_name(name, :index, options) do
     extract_action_name(:index, options) || index_name(name)
   end
-
   def action_name(name, action, options) do
     extract_action_name(action, options) || String.to_atom("#{action}_#{name}")
   end
