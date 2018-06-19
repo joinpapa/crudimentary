@@ -2,7 +2,13 @@ defmodule CRUDimentary.Absinthe.Resolvers.Base do
   defmacro __using__(_) do
     quote do
       @current_account_cache_key :current_account
-      alias CRUDimentary.Cache.InMemory, as: Cache
+      import CRUDimentary.Absinthe.Resolvers.Services.{
+        Cache,
+        Pagination,
+        ResultFormatter,
+        Querying,
+        Authorization
+      }
 
       def call(parent, args, resolution) do
         resolve_current_account(resolution)
@@ -26,48 +32,6 @@ defmodule CRUDimentary.Absinthe.Resolvers.Base do
           cache_get(resolution, @current_account_cache_key)
         else
           nil
-        end
-      end
-
-      defp cache_get(resolution, key) do
-        agent = get_agent(resolution)
-
-        if agent do
-          Cache.get(agent, key)
-        else
-          nil
-        end
-      end
-
-      defp cache_set(resolution, key, value) do
-        agent = get_agent(resolution)
-
-        if agent do
-          Cache.set(agent, key, value)
-        else
-          nil
-        end
-      end
-
-      defp cache_delete(resolution, key) do
-        agent = get_agent(resolution)
-
-        if agent do
-          Cache.delete(agent, key)
-        else
-          nil
-        end
-      end
-
-      defp get_agent(resolution) do
-        get_in(resolution.context, [:cache])
-      end
-
-      defp wrap_result(result) do
-        case result do
-          {:ok, result} -> {:ok, %{data: result}}
-          {:error, _, error, _} -> {:error, error}
-          error -> {:error, error}
         end
       end
     end

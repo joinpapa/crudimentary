@@ -1,5 +1,5 @@
 defmodule CRUDimentary.Policy do
-  defmacro __using__ do
+  defmacro __using__(_) do
     quote do
       def scope(queriable, _current_account) do
         if Code.ensure_compiled?(Ecto.Query) do

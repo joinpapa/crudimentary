@@ -1,5 +1,8 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
-  import CRUDimentary.Absinthe.Resolvers.Generic
+  import CRUDimentary.Absinthe.Resolvers.Services.{
+    Authorization,
+    ResultFormatter
+  }
 
   def call(schema, _current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],

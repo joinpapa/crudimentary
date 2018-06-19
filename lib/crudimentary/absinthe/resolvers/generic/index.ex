@@ -1,5 +1,10 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Generic.Index do
-  import CRUDimentary.Absinthe.Resolvers.Generic
+  import CRUDimentary.Absinthe.Resolvers.Services.{
+    Authorization,
+    ResultFormatter,
+    Querying,
+    Pagination
+  }
 
   def call(schema, current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],
