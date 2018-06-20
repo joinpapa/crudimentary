@@ -4,7 +4,7 @@
 ##### TODO: HEX DOCS
 -------------------------
 
-Absinthe helper for queriable CRUD resource endpoints (queries and mutations).
+Absinthe helper for queriable CRUD resource endpoints (queries and mutations). 
 
 This package contains set of field generators for Absinthe including generic resolvers for sorting, filtering and pagination of output data which removes much of repeatative boilerplate code. Also includes policy and caching mechanism.
 
@@ -23,7 +23,7 @@ Every generation starts in Absinthe schema, inside query or mutation macro. Insi
 query do
 
   CRUDimentary.Absinthe.EndpointGenerator.generic_query(
-    :account,
+    :account, 
     Project.API.Resolvers.Account,
     [
       error_handler: ErrorHandler,
@@ -142,13 +142,24 @@ end
 
 ### Resolver services
 
-If you're defining custom (regular) mutation out of CRUD scope you can use and combine any of stock resolver services. List of possible services:
+If you're defining custom (regular) mutation out of CRUD scope you can use and combine any of stock resolver services. Or you can `use CRUDimentary.Absinthe.Resolvers.Base` which automatically resolves and stores current user into caches and imports all of the services (in that case you define &call/4 function).
+
+List of possible services:
   * Authorization
   * Cache
   * Pagination
   * Querying
   * Result formatter
 
+```
+defmodule ProjectWeb.API.Resolvers.Account.CustomMutation do
+  use CRUDimentary.Absinthe.Resolvers.Base
+
+   def call(current_account, parent, args, resolution) do
+    {:ok, true}
+  end
+end
+```
 #### Using cached values in requests
 
 In some cases we need to preserve state during complex request. For example while registering user for the first time we need to do additional resource creations which depends upon current user, because user is not authenticated thorough any kind of authentication system we need to storing somewhere. We can easily store those kind of values thanks to Erlangs OTP and in this context is implemented through `CRUDimentary.Absinthe.Resolvers.Services.Cache` module. All caches are destroyed before sending a response to the client.
