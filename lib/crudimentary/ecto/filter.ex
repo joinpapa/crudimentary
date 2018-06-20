@@ -144,12 +144,14 @@ defmodule CRUDimentary.Ecto.Filter do
 
   defp resolve_attribute(attribute, mapping) when is_map(mapping) do
     if Map.has_key?(mapping, attribute) do
-      mapping[attribute] |> String.split("/") |> List.last() |> String.to_atom()
+      mapping[attribute]
+      |> String.split("/")
+      |> List.last()
+      |> String.to_atom()
     else
       attribute
     end
   end
-
   defp resolve_attribute(attribute, _), do: attribute
 
   defp extract_custom_filter(filters, attribute, matcher) do
