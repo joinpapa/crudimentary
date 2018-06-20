@@ -10,7 +10,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
          policy <- options[:policy],
          params <-
            apply_mapping(args[:input], options[:mapping])
-           |> permitted_params(schema, current_account, policy),
+           |> permitted_params(current_account, policy),
          changeset <-
            apply(
              schema,

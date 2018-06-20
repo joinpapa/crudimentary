@@ -23,7 +23,7 @@ Every generation starts in Absinthe schema, inside query or mutation macro. Insi
 query do
 
   CRUDimentary.Absinthe.EndpointGenerator.generic_query(
-    :account, 
+    :account,
     Project.API.Resolvers.Account,
     [
       error_handler: ErrorHandler,
