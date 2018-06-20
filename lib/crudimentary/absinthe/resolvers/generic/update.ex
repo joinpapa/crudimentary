@@ -4,13 +4,13 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
     ResultFormatter
   }
 
-  def call(schema, _current_account, _parent, args, _resolution, options) do
+  def call(schema, current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],
          {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
          policy <- options[:policy],
          params <-
            apply_mapping(args[:input], options[:mapping])
-           |> permitted_params(policy),
+           |> permitted_params(schema, current_account, policy),
          changeset <-
            apply(
              schema,

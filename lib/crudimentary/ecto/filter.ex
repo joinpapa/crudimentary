@@ -152,6 +152,7 @@ defmodule CRUDimentary.Ecto.Filter do
       attribute
     end
   end
+
   defp resolve_attribute(attribute, _), do: attribute
 
   defp extract_custom_filter(filters, attribute, matcher) do

@@ -1,21 +1,7 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
-  def wrap_result(result) do
-    case result do
-      {:ok, result} -> {:ok, %{data: result}}
-      {:error, _, error, _} -> {:error, error}
-      error -> {:error, error}
-    end
-  end
-
   def result(queriable, mapping \\ nil, pagination \\ nil)
-
-  def result({:error, _, error, _}, _, _) do
-    {:error, error}
-  end
-
-  def result({:error, error}, _, _) do
-    {:error, error}
-  end
+  def result({:error, _, error, _}, _, _), do: {:error, error}
+  def result({:error, error}, _, _), do: {:error, error}
 
   def result({:ok, queriable}, mapping, pagination) do
     result(queriable, mapping, pagination)

@@ -10,7 +10,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Create do
          {:authorized, true} <- {:authorized, authorized?(policy, current_account, :create)},
          params <-
            apply_mapping(args[:input], options[:mapping])
-           |> permitted_params(policy),
+           |> permitted_params(schema, current_account, policy),
          changeset <-
            apply(
              schema,
