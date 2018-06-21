@@ -33,13 +33,11 @@ defmodule CRUDimentary.Policy do
       def destroy(current_account), do: destroy(nil, current_account)
       def destroy(_record, _current_account), do: false
 
-      def permitted_attributes(current_account) do
-        permitted_attributes(nil, current_account)
-      end
+      def permitted_params(current_account), do: permitted_params(nil, current_account)
+      def permitted_params(_record, _current_account), do: []
 
-      def permitted_attributes(_record, _current_account) do
-        []
-      end
+      def accessible_attributes(current_account), do: accessible_attributes(nil, current_account)
+      def accessible_attributes(_record, _current_account), do: []
 
       defoverridable scope: 2,
                      index: 2,
@@ -47,7 +45,8 @@ defmodule CRUDimentary.Policy do
                      create: 2,
                      update: 2,
                      destroy: 2,
-                     permitted_attributes: 2
+                     permitted_params: 2,
+                     accessible_attributes: 2
     end
   end
 end
