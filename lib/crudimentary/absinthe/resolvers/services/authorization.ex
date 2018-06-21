@@ -12,8 +12,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
     policy.authorized?(action, record, account)
   end
 
-  defp filter_map(map, permitted_keys) do
-    Enum.reduce(map, %{}, &filter_map(&1, &2, permitted_keys))
+  defp filter_map(map, permission_list) do
+    Enum.reduce(map, %{}, &filter_map(&1, &2, permission_list))
   end
   defp filter_map({key, value}, map, permitted_params) when is_map(value) do
     if permitted_params[key] do
