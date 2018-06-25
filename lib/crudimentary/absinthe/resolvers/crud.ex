@@ -1,4 +1,11 @@
-defmodule CRUDimentary.Absinthe.Resolvers.Generic do
+defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
+  import CRUDimentary.Absinthe.Resolvers.Services.{
+    Authorization,
+    ResultFormatter,
+    Querying,
+    Pagination
+  }
+
   defmacro __using__(params) do
     quote do
       use CRUDimentary.Absinthe.Resolvers.Base
@@ -10,25 +17,176 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic do
 
         module =
           if action in @actions do
-            submodule =
-              action
-              |> Atom.to_string()
-              |> String.capitalize()
+            params = [
+              unquote(params[:schema]),
+              current_account,
+              parent,
+              args,
+              resolution,
+              unquote(params[:options])
+            ]
 
-            Module.concat(unquote(__MODULE__), submodule)
+            apply(unquote(__MODULE__), action, params)
           else
             raise("Unknown action")
           end
-
-        module.call(
-          unquote(params[:schema]),
-          current_account,
-          parent,
-          args,
-          resolution,
-          unquote(params[:options])
-        )
       end
+    end
+  end
+
+  @doc """
+  Returns paginated list of resources based uppon resolvers policy for currently logged user.
+  Also it applies filtering, sorting and pagination functions.
+  In opposite it raises authorization error.
+  """
+  @spec index(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
+  def index(schema, current_account, _parent, args, _resolution, options) do
+    with repo <- options[:repo],
+         policy <- options[:policy],
+         {:authorized, true} <- {:authorized, authorized?(policy, current_account, :index)} do
+      schema
+      |> scope(current_account, policy)
+      |> filter(args[:filter], options[:mapping], options[:filters])
+      |> sort(args[:sorting])
+      |> paginate(args[:sorting], args[:pagination], repo)
+      |> result_from_pagination(options[:mapping])
+    else
+      {:authorized, _} -> {:error, :unauthorized}
+      {:error, _, changeset, _} -> {:error, changeset}
+      {:error, error} -> {:error, error}
+      error -> {:error, error}
+    end
+  end
+
+  @doc """
+  Shows and existing resource based uppon resolvers policy for currently logged user.
+  In opposite it raises authorization error.
+  """
+  @spec show(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
+  def show(schema, current_account, _parent, args, _resolution, options) do
+    with repo <- options[:repo],
+         policy <- options[:policy],
+         {:authorized, true} <- {:authorized, authorized?(policy, current_account, :show)},
+         record <- repo.get_by(schema, id: args[:id]) do
+      result(record)
+    else
+      {:authorized, _} -> {:error, :unauthorized}
+      {:error, _, changeset, _} -> {:error, changeset}
+      {:error, error} -> {:error, error}
+      error -> {:error, error}
+    end
+  end
+
+  @doc """
+  Creates and returns new resource based uppon resolvers policy for currently logged user.
+  In opposite it raises authorization, changeset or insertion error.
+  """
+  @spec create(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map}} | {:error, any}
+  def create(schema, current_account, _parent, args, _resolution, options) do
+    with repo <- options[:repo],
+         policy <- options[:policy],
+         {:authorized, true} <- {:authorized, authorized?(policy, current_account, :create)},
+         params <-
+           apply_mapping(args[:input], options[:mapping])
+           |> permitted_params(current_account, policy),
+         changeset <-
+           apply(
+             schema,
+             options[:changeset_function] || :changeset,
+             [struct(schema, []), params]
+           ),
+         {:ok, resource} <- repo.insert(changeset) do
+      result(resource)
+    else
+      {:authorized, _} -> {:error, :unauthorized}
+      {:error, _, changeset, _} -> {:error, changeset}
+      {:error, error} -> {:error, error}
+      error -> {:error, error}
+    end
+  end
+
+  @doc """
+  Updates and returns existing resource based uppon resolvers policy for currently logged user.
+  In opposite it raises authorization, changeset or update error.
+  """
+  @spec update(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
+  def update(schema, current_account, _parent, args, _resolution, options) do
+    with repo <- options[:repo],
+         {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
+         policy <- options[:policy],
+         params <-
+           apply_mapping(args[:input], options[:mapping])
+           |> permitted_params(current_account, policy),
+         changeset <-
+           apply(
+             schema,
+             options[:changeset_function] || :changeset,
+             [resource, params]
+           ),
+         {:ok, updated_resource} <- repo.update(changeset) do
+      result(updated_resource)
+    else
+      {:resource, _} -> {:error, :no_resource}
+      {:error, _, changeset, _} -> {:error, changeset}
+      {:error, error} -> {:error, error}
+      error -> {:error, error}
+    end
+  end
+
+  @doc """
+  Deletes and returns last instance of resource based uppon resolvers policy for currently logged user.
+  In opposite it raises authorization, changeset or deletion error.
+  """
+  @spec destroy(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map}} | {:error, any}
+  def destroy(schema, current_account, _parent, args, _resolution, options) do
+    with repo <- options[:repo],
+         policy <- options[:policy],
+         resource <- repo.get_by(schema, id: args[:id]),
+         {:authorized, true} <-
+           {:authorized, authorized?(policy, resource, current_account, :destroy)},
+         {:resource, false} <- {:resource, is_nil(resource)},
+         {:destroy, {:ok, _}} <- {:destroy, repo.delete(resource)} do
+      result(resource)
+    else
+      {:authorized, _} -> {:error, :unauthorized}
+      {:resource, _} -> {:error, :non_existant_resource}
+      {:destroy, _} -> {:error, :unable_to_destroy_resource}
+      error -> {:error, error}
     end
   end
 end
