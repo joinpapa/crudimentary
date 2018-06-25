@@ -7,6 +7,7 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
 
   @query_types [:index, :show]
   @mutation_types [:create, :update, :destroy]
+  @error_handler Application.get_env(CRUDimentary.MixProject.project[:app], :error_handler)
 
   @doc """
   Generates Absinthe schema query CRUD (index and show) fields based uppon options.
@@ -168,9 +169,10 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
         )
 
         unquote(
-          if options[:error_handler] do
+          error_handler = options[:error_handler] || @error_handler
+          if error_handler do
             quote do
-              middleware(unquote(options[:error_handler]))
+              middleware(unquote(error_handler))
             end
           end
         )
