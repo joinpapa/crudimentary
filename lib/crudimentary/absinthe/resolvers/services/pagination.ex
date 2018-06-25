@@ -1,4 +1,6 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
+  @moduledoc false
+
   import CRUDimentary.Absinthe.Resolvers.Services.Querying, only: [sort_list: 1]
 
   def paginate(queriable, sortings, pagination, repo) do

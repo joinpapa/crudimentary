@@ -1,4 +1,15 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
+  @moduledoc false
+
+  alias Paginator.Page.Metadata
+
+  @type pagination_result :: %{
+          after_cursor: Metadata.opaque_cursor,
+          before_cursor: Metadata.opaque_cursor,
+          limit: integer,
+          total_count: integer
+        }
+
   def wrap_result(result) do
     case result do
       {:ok, result} -> {:ok, %{data: result}}
@@ -31,7 +42,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
     }
   end
 
-  def format_pagination(%Paginator.Page.Metadata{} = pagination) do
+  def format_pagination(%Metadata{} = pagination) do
     %{
       after_cursor: pagination.after,
       before_cursor: pagination.before,

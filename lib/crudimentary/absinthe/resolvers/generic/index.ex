@@ -6,6 +6,19 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Index do
     Pagination
   }
 
+  @doc """
+  Returns paginated list of resources based uppon resolvers policy for currently logged user.
+  Also it applies filtering, sorting and pagination functions.
+  In opposite it raises authorization error.
+  """
+  @spec call(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
   def call(schema, current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],
          policy <- options[:policy],

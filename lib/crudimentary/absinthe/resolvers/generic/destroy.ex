@@ -4,6 +4,18 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Destroy do
     ResultFormatter
   }
 
+  @doc """
+  Deletes and returns last instance of resource based uppon resolvers policy for currently logged user.
+  In opposite it raises authorization, changeset or deletion error.
+  """
+  @spec call(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map}} | {:error, any}
   def call(schema, current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],
          policy <- options[:policy],

@@ -1,4 +1,6 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Services.Cache do
+  @moduledoc false
+
   alias CRUDimentary.Cache.InMemory, as: Cache
 
   def cache_get(resolution, key) do

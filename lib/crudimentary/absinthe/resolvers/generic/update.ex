@@ -4,6 +4,18 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
     ResultFormatter
   }
 
+  @doc """
+  Updates and returns existing resource based uppon resolvers policy for currently logged user.
+  In opposite it raises authorization, changeset or update error.
+  """
+  @spec call(
+          schema :: Ecto.Schema.t(),
+          current_account :: Ecto.Schema.t(),
+          parent :: Ecto.Schema.t(),
+          args :: map,
+          resolution :: map,
+          options :: keyword
+        ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
   def call(schema, current_account, _parent, args, _resolution, options) do
     with repo <- options[:repo],
          {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
@@ -18,12 +30,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Generic.Update do
              [resource, params]
            ),
          {:ok, updated_resource} <- repo.update(changeset) do
-      {
-        :ok,
-        %{
-          data: updated_resource
-        }
-      }
+      result(updated_resource)
     else
       {:resource, _} -> {:error, :no_resource}
       {:error, _, changeset, _} -> {:error, changeset}

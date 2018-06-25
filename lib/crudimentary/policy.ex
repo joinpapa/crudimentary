@@ -1,4 +1,9 @@
 defmodule CRUDimentary.Policy do
+  @moduledoc """
+  This module generates and defines set of overridable functions which regulate scope of access
+  and action authorization based on the current account properties.
+  """
+
   defmacro __using__(_) do
     quote do
       def scope(queriable, _current_account) do

@@ -7,7 +7,13 @@ defmodule CRUDimentary.MixProject do
       version: "0.1.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      name: "CRUDimentary",
+      source_url: "https://github.com/stankec/crudimentary",
+      docs: [
+        main: "Crudimentary",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -19,6 +25,7 @@ defmodule CRUDimentary.MixProject do
 
   defp deps do
     [
+      {:ex_doc, "~> 0.16"},
       {:odgn_json_pointer, "~> 2.3"},
       {:inflex, "~> 1.10.0"},
       {:paginator, "~> 0.3"},

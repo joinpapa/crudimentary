@@ -1,4 +1,6 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Services.Querying do
+  @moduledoc false
+
   import Ecto.Query
 
   def scope_module(_schema, policy) do

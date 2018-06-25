@@ -1,4 +1,6 @@
 defmodule CRUDimentary.Absinthe.Generator.ResultType do
+  @moduledoc false
+
   defmacro generic_result_types(name) do
     quote do
       unquote(__MODULE__).result_types(unquote(name), unquote(name))

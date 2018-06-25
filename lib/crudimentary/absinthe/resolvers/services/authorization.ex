@@ -1,4 +1,6 @@
 defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
+  @moduledoc false
+
   def permitted_params(params, account, policy) do
     permitted_params = policy.permitted_params(account)
     filter_map(params, permitted_params)
@@ -15,6 +17,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
   defp filter_map(map, permission_list) do
     Enum.reduce(map, %{}, &filter_map(&1, &2, permission_list))
   end
+
   defp filter_map({key, value}, map, permitted_params) when is_map(value) do
     if permitted_params[key] do
       Map.put(map, key, filter_map(value, permitted_params[key]))
@@ -22,6 +25,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
       map
     end
   end
+
   defp filter_map({key, value}, map, permitted_params) do
     if Enum.member?(permitted_params, key), do: Map.put(map, key, value), else: map
   end
