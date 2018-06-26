@@ -118,7 +118,9 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
              base_module,
              options
            ) do
+    error_handler = options[:error_handler] || @error_handler
     quote do
+      @desc unquote(generate_description(name, action_type))
       field(
         unquote(action_name(name, action_type, options)),
         unquote(
@@ -169,7 +171,6 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
         )
 
         unquote(
-          error_handler = options[:error_handler] || @error_handler
           if error_handler do
             quote do
               middleware(unquote(error_handler))
@@ -187,6 +188,13 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
       end
     end
   end
+
+  @doc false
+  def generate_description(name, :index), do: "Fetches filtered and sorted list of #{name} resources"
+  def generate_description(name, :show), do: "Fetches single #{name} resource by id"
+  def generate_description(name, :create), do: "Creates new #{name} resource"
+  def generate_description(name, :update), do: "Updates existing #{name} resource by id"
+  def generate_description(name, :destroy), do: "Deletes #{name} resource by id"
 
   @doc false
   def included?(action, options) do

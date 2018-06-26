@@ -17,21 +17,20 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
       def call(current_account, parent, args, resolution) do
         action = unquote(params[:action])
 
-        module =
-          if action in @actions do
-            params = [
-              unquote(params[:schema]),
-              current_account,
-              parent,
-              args,
-              resolution,
-              unquote(params[:options])
-            ]
+        if action in @actions do
+          params = [
+            unquote(params[:schema]),
+            current_account,
+            parent,
+            args,
+            resolution,
+            unquote(params[:options])
+          ]
 
-            apply(unquote(__MODULE__), action, params)
-          else
-            raise("Unknown action")
-          end
+          apply(unquote(__MODULE__), action, params)
+        else
+          raise(ArgumentError, message: "unknown action #{action}")
+        end
       end
     end
   end

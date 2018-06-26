@@ -4,11 +4,11 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
       use CRUDimentary.Absinthe.Resolvers.Base
 
       def call(current_account, parent, args, %{definition: %{schema_node: %{identifier: field}}}) do
-        if field in unquote(params[:policy]).accessible_attributes(nil, current_account) do
-          if field in Map.keys(parent) do
-            {:ok, Map.get(parent, field)}
-          else
+        if field in unquote(params[:policy]).accessible_attributes(parent, current_account) do
+          try do
             call(current_account, parent, args, field)
+          rescue
+            UndefinedFunctionError -> {:ok, Map.get(parent, field)}
           end
         else
           {:ok, nil}
