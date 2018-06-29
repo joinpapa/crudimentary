@@ -8,7 +8,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
           try do
             call(current_account, parent, args, field)
           rescue
-            UndefinedFunctionError -> {:ok, Map.get(parent, field)}
+            FunctionClauseError -> {:ok, Map.get(parent, field)}
           end
         else
           {:ok, nil}
