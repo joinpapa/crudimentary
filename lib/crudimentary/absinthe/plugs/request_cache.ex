@@ -29,8 +29,7 @@ defmodule CRUDimentary.Absinthe.Plugs.RequestCache do
         :absinthe,
         %{
           context: %{
-            cache: cache,
-            current_account: account
+            cache: cache
           }
         }
       )
