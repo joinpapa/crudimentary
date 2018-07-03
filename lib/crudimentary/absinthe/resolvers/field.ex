@@ -3,10 +3,15 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
     quote do
       use CRUDimentary.Absinthe.Resolvers.Base
 
-      def call(current_account, parent, args, %{definition: %{schema_node: %{identifier: field}}}) do
+      def call(
+            current_account,
+            parent,
+            args,
+            %{definition: %{schema_node: %{identifier: field}}} = resolution
+          ) do
         if field in unquote(params[:policy]).accessible_attributes(parent, current_account) do
           try do
-            call(current_account, parent, args, field)
+            call(field, current_account, parent, args, resolution)
           rescue
             FunctionClauseError -> {:ok, Map.get(parent, field)}
           end
