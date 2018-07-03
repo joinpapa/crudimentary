@@ -14,6 +14,16 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
     policy.authorized?(action, record, account)
   end
 
+  def policy_module(%Ecto.Query{} = queriable) do
+    {_, schema} = Ecto.Queryable.to_query(queriable).from
+    policy_module(schema)
+  end
+
+  def policy_module(module) do
+    [project_module, context_module, schema_module] = Module.split(module)
+    Module.concat([project_module, context_module, Policies, schema_module])
+  end
+
   defp filter_map(map, permission_list) do
     Enum.reduce(map, %{}, &filter_map(&1, &2, permission_list))
   end

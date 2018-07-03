@@ -4,8 +4,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
   alias Paginator.Page.Metadata
 
   @type pagination_result :: %{
-          after_cursor: Metadata.opaque_cursor,
-          before_cursor: Metadata.opaque_cursor,
+          after_cursor: Metadata.opaque_cursor(),
+          before_cursor: Metadata.opaque_cursor(),
           limit: integer,
           total_count: integer
         }

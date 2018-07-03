@@ -7,7 +7,7 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
 
   @query_types [:index, :show]
   @mutation_types [:create, :update, :destroy]
-  @error_handler Application.get_env(CRUDimentary.MixProject.project[:app], :error_handler)
+  @error_handler Application.get_env(CRUDimentary.MixProject.project()[:app], :error_handler)
 
   @doc """
   Generates Absinthe schema query CRUD (index and show) fields based uppon options.
@@ -119,6 +119,7 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
              options
            ) do
     error_handler = options[:error_handler] || @error_handler
+
     quote do
       @desc unquote(generate_description(name, action_type))
       field(
@@ -190,7 +191,9 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
   end
 
   @doc false
-  def generate_description(name, :index), do: "Fetches filtered and sorted list of #{name} resources"
+  def generate_description(name, :index),
+    do: "Fetches filtered and sorted list of #{name} resources"
+
   def generate_description(name, :show), do: "Fetches single #{name} resource by id"
   def generate_description(name, :create), do: "Creates new #{name} resource"
   def generate_description(name, :update), do: "Updates existing #{name} resource by id"
