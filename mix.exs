@@ -31,8 +31,7 @@ defmodule CRUDimentary.MixProject do
       {:paginator, "~> 0.3"},
       {:phoenix, ">= 0.0.0"},
       {:absinthe, "~> 1.4"},
-      {:guardian, "~> 1.0"},
-      {:delirium_tremex, github: "floatingpointio/delirium_tremex"}
+      {:guardian, "~> 1.0"}
     ]
   end
 end
