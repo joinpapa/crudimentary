@@ -48,7 +48,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
           resolution :: map,
           options :: keyword
         ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
-  def index(schema, current_account, _parent, args, _resolution, options) do
+  def index(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
          {:authorized, true} <- {:authorized, authorized?(policy, current_account, :index)} do
@@ -78,7 +78,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
           resolution :: map,
           options :: keyword
         ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
-  def show(schema, current_account, _parent, args, _resolution, options) do
+  def show(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
          {:authorized, true} <- {:authorized, authorized?(policy, current_account, :show)},
@@ -104,7 +104,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
           resolution :: map,
           options :: keyword
         ) :: {:ok, %{data: map}} | {:error, any}
-  def create(schema, current_account, _parent, args, _resolution, options) do
+  def create(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
          {:authorized, true} <- {:authorized, authorized?(policy, current_account, :create)},
@@ -139,7 +139,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
           resolution :: map,
           options :: keyword
         ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
-  def update(schema, current_account, _parent, args, _resolution, options) do
+  def update(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
          policy <- options[:policy] || policy_module(schema),
@@ -174,7 +174,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
           resolution :: map,
           options :: keyword
         ) :: {:ok, %{data: map}} | {:error, any}
-  def destroy(schema, current_account, _parent, args, _resolution, options) do
+  def destroy(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
          resource <- repo.get_by(schema, id: args[:id]),
