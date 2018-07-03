@@ -1,4 +1,4 @@
-defmodule CRUDimentary.Absinthe.Plugs.RequestCache do
+defmodule CRUDimentary.Absinthe.Plugs.Context do
   @moduledoc """
   Plug for issuing cache during response creation.
   This plug creates temporary cache storage uppon incoming request, cache (GenServer) pid is stored in Absinthe Resolution Context.
