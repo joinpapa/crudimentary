@@ -20,8 +20,12 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
   end
 
   def policy_module(module) do
-    [project_module, context_module, schema_module] = Module.split(module)
-    Module.concat([project_module, context_module, Policies, schema_module])
+    case Module.split(module) do
+      [project_module, context_module, schema_module] ->
+        Module.concat([project_module, context_module, Policies, schema_module])
+      [project_module, schema_module] ->
+        Module.concat([project_module, Policies, schema_module])
+    end
   end
 
   defp filter_map(map, permission_list) do
