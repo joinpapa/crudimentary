@@ -3,6 +3,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
     quote do
       use CRUDimentary.Absinthe.Resolvers.Base
 
+      def call(nil, _, _, _, _), do: raise(ArgumentError, message: "field can not be nil")
       def call(
             current_account,
             parent,
@@ -13,9 +14,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
           try do
             call(field, current_account, parent, args, resolution)
           rescue
-            UndefinedFunctionError -> unquote(__MODULE__).return_field(parent, field)
-            FunctionClauseError    -> unquote(__MODULE__).return_field(parent, field)
-            CompileError           -> unquote(__MODULE__).return_field(parent, field)
+            FunctionClauseError ->
+              unquote(__MODULE__).return_field(parent, field)
           end
         else
           {:ok, nil}
