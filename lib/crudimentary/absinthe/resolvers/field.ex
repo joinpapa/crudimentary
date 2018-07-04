@@ -13,7 +13,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
           try do
             call(field, current_account, parent, args, resolution)
           rescue
-            FunctionClauseError -> {:ok, Map.get(parent, field)}
+            UndefinedFunctionError -> {:ok, unquote(__MODULE__).get_field(parent, field)}
+            FunctionClauseError    -> {:ok, unquote(__MODULE__).get_field(parent, field)}
           end
         else
           {:ok, nil}
@@ -21,4 +22,6 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
       end
     end
   end
+
+  def get_field(struct, field), do: Map.from_struct(struct)[field]
 end
