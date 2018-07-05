@@ -48,12 +48,12 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
           resolution :: map,
           options :: keyword
         ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
-  def index(schema, current_account, _parent, args, _resolution, options \\ []) do
+  def index(schema, current_account, parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
          {:authorized, true} <- {:authorized, authorized?(policy, current_account, :index)} do
       schema
-      |> scope(current_account, policy)
+      |> scope(current_account, parent, policy)
       |> filter(args[:filter], options[:mapping], options[:filters])
       |> sort(args[:sorting])
       |> paginate(args[:sorting], args[:pagination], repo)

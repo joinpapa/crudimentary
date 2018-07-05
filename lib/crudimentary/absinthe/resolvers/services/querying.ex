@@ -11,11 +11,11 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Querying do
     end
   end
 
-  def scope(schema, current_account, policy) do
+  def scope(schema, current_account, parent, policy) do
     scope_module = scope_module(schema, policy)
 
     if scope_module do
-      scope_module.scope(schema, current_account)
+      scope_module.scope(schema, current_account, parent)
     else
       schema
     end
