@@ -81,8 +81,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
   def show(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
-         {:authorized, true} <- {:authorized, authorized?(policy, current_account, :show)},
-         record <- repo.get_by(schema, id: args[:id]) do
+         record <- repo.get_by(schema, id: args[:id]),
+         {:authorized, true} <- {:authorized, authorized?(policy, record, current_account, :show)} do
       result(record)
     else
       {:authorized, _} -> {:error, :unauthorized}
@@ -181,9 +181,9 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
          resource <- repo.get_by(schema, id: args[:id]),
+         {:resource, false} <- {:resource, is_nil(resource)},
          {:authorized, true} <-
            {:authorized, authorized?(policy, resource, current_account, :destroy)},
-         {:resource, false} <- {:resource, is_nil(resource)},
          {:destroy, {:ok, _}} <- {:destroy, repo.delete(resource)} do
       result(resource)
     else
