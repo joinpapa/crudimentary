@@ -16,7 +16,6 @@ defmodule CRUDimentary.Absinthe.Generator.ResultType do
 
       object(unquote(__MODULE__.result_name(name, :single))) do
         field(:data, unquote(type))
-        field(:pagination, :pagination)
       end
     end
   end
