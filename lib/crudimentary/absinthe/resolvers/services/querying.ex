@@ -4,7 +4,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Querying do
   import Ecto.Query
 
   def scope_module(_schema, policy) do
-    if function_exported?(policy, :scope, 2) do
+    if function_exported?(policy, :scope, 3) do
       policy
     else
       nil
