@@ -6,7 +6,7 @@ defmodule CRUDimentary.Policy do
 
   defmacro __using__(_) do
     quote do
-      def scope(queriable, _current_account) do
+      def scope(queriable, _current_account, _parent) do
         if Code.ensure_compiled?(Ecto.Query) do
           import Ecto.Query
           from(r in queriable, where: 1 == 0)
@@ -46,7 +46,7 @@ defmodule CRUDimentary.Policy do
 
       def own_record?(record, current_account), do: record.account_id == current_account.id
 
-      defoverridable scope: 2,
+      defoverridable scope: 3,
                      index: 2,
                      show: 2,
                      create: 2,
