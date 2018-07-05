@@ -57,7 +57,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
       |> filter(args[:filter], options[:mapping], options[:filters])
       |> sort(args[:sorting])
       |> paginate(args[:sorting], args[:pagination], repo)
-      |> result_from_pagination(options[:mapping])
+      |> result(options[:mapping])
     else
       {:authorized, _} -> {:error, :unauthorized}
       {:error, _, changeset, _} -> {:error, changeset}

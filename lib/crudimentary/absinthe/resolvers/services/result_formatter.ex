@@ -10,36 +10,32 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
           total_count: integer
         }
 
-  def wrap_result(result) do
-    case result do
-      {:ok, result} -> {:ok, %{data: result}}
-      {:error, _, error, _} -> {:error, error}
-      error -> {:error, error}
-    end
-  end
+  def result(queriable, mapping \\ nil)
 
-  def result(queriable, mapping \\ nil, pagination \\ nil)
-
-  def result({:error, _, error, _}, _, _) do
+  def result({:error, _, error, _}, _) do
     {:error, error}
   end
 
-  def result({:error, error}, _, _) do
+  def result({:error, error}, _) do
     {:error, error}
   end
 
-  def result({:ok, queriable}, mapping, pagination) do
-    result(queriable, mapping, pagination)
+  def result({:ok, queriable}, mapping) do
+    result(queriable, mapping)
   end
 
-  def result(queriable, mapping, pagination) do
+  def result(%{entries: queriable, metadata: metadata}, mapping) do
     {
       :ok,
       %{
         data: queriable |> apply_mapping(mapping) |> data_load(),
-        pagination: format_pagination(pagination)
+        pagination: format_pagination(metadata)
       }
     }
+  end
+
+  def result(queriable, mapping) do
+    {:ok, %{data: queriable |> apply_mapping(mapping)}}
   end
 
   def format_pagination(%Metadata{} = pagination) do
@@ -52,10 +48,6 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
   end
 
   def format_pagination(_), do: nil
-
-  def result_from_pagination(pagination, mapping \\ nil) do
-    result(pagination.entries, mapping, pagination.metadata)
-  end
 
   def apply_mapping(data, nil), do: data
 
@@ -77,7 +69,6 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
     end)
   end
 
-  def data_load(nil), do: nil
   def data_load(data) when is_list(data), do: Enum.map(data, &data_load/1)
   def data_load(data), do: data
 end
