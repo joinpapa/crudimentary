@@ -32,7 +32,11 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
     Enum.reduce(map, %{}, &filter_map(&1, &2, permission_list))
   end
 
-  defp filter_map({key, value}, map, permitted_params) when is_map(value) do
+  defp filter_map({key, %_{} = value}, map, permitted_params) do
+    add_if_member(map, key, value, permitted_params)
+  end
+
+  defp filter_map({key, %{} = value}, map, permitted_params) when is_map(value) do
     if permitted_params[key] do
       Map.put(map, key, filter_map(value, permitted_params[key]))
     else
@@ -41,6 +45,14 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
   end
 
   defp filter_map({key, value}, map, permitted_params) do
-    if Enum.member?(permitted_params, key), do: Map.put(map, key, value), else: map
+    add_if_member(map, key, value, permitted_params)
+  end
+
+  defp add_if_member(map, key, value, list) do
+    if Enum.member?(list, key) do
+      Map.put(map, key, value)
+    else
+      map
+    end
   end
 end
