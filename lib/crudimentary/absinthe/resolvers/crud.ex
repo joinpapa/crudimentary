@@ -143,6 +143,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
     with repo <- options[:repo] || @repo,
          {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
          policy <- options[:policy] || policy_module(schema),
+         {:authorized, true} <-
+           {:authorized, authorized?(policy, resource, current_account, :update)},
          params <-
            apply_mapping(args[:input], options[:mapping])
            |> permitted_params(current_account, policy),
@@ -155,6 +157,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
          {:ok, updated_resource} <- repo.update(changeset) do
       result(updated_resource)
     else
+      {:authorized, _} -> {:error, :unauthorized}
       {:resource, _} -> {:error, :no_resource}
       {:error, _, changeset, _} -> {:error, changeset}
       {:error, error} -> {:error, error}
