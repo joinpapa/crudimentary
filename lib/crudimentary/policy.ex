@@ -44,6 +44,7 @@ defmodule CRUDimentary.Policy do
       def accessible_attributes(current_account), do: accessible_attributes(nil, current_account)
       def accessible_attributes(_record, _current_account), do: []
 
+      def own_record?(record, nil), do: false
       def own_record?(record, current_account), do: record.account_id == current_account.id
 
       defoverridable scope: 3,
@@ -53,7 +54,8 @@ defmodule CRUDimentary.Policy do
                      update: 2,
                      destroy: 2,
                      permitted_params: 2,
-                     accessible_attributes: 2
+                     accessible_attributes: 2,
+                     own_record: 2
     end
   end
 end
