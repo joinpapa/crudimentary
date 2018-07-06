@@ -55,7 +55,7 @@ defmodule CRUDimentary.Policy do
                      destroy: 2,
                      permitted_params: 2,
                      accessible_attributes: 2,
-                     own_record: 2
+                     own_record?: 2
     end
   end
 end
