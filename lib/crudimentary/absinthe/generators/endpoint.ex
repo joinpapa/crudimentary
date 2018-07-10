@@ -125,9 +125,12 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
       field(
         unquote(action_name(name, action_type, options)),
         unquote(
-          if action_type == :index do
+          case action_type do
+          :index ->
             result_name(name, :list)
-          else
+          :show ->
+            name
+          _ ->
             result_name(name, :single)
           end
         )
