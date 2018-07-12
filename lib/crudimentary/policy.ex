@@ -44,10 +44,6 @@ defmodule CRUDimentary.Policy do
       def accessible_attributes(current_account), do: accessible_attributes(nil, current_account)
       def accessible_attributes(_resoure, _current_account), do: []
 
-      def own_resource?(_resoure, _current_account), do: false
-
-      def admin?(_current_account), do: false
-
       defoverridable scope: 3,
                      index: 2,
                      show: 2,
@@ -55,9 +51,7 @@ defmodule CRUDimentary.Policy do
                      update: 2,
                      destroy: 2,
                      permitted_params: 2,
-                     accessible_attributes: 2,
-                     own_resource?: 2,
-                     admin?: 1
+                     accessible_attributes: 2
     end
   end
 end
