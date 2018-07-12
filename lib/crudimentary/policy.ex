@@ -19,32 +19,32 @@ defmodule CRUDimentary.Policy do
         authorized?(action, nil, current_account)
       end
 
-      def authorized?(action, record, current_account) do
-        apply(__MODULE__, action, [record, current_account])
+      def authorized?(action, resoure, current_account) do
+        apply(__MODULE__, action, [resoure, current_account])
       end
 
       def index(current_account), do: index(nil, current_account)
-      def index(record, current_account), do: show(record, current_account)
+      def index(resoure, current_account), do: show(resoure, current_account)
 
       def show(current_account), do: show(nil, current_account)
-      def show(_record, _current_account), do: false
+      def show(_resoure, _current_account), do: false
 
       def create(current_account), do: create(nil, current_account)
-      def create(_record, _current_account), do: false
+      def create(_resoure, _current_account), do: false
 
       def update(current_account), do: update(nil, current_account)
-      def update(_record, _current_account), do: false
+      def update(_resoure, _current_account), do: false
 
       def destroy(current_account), do: destroy(nil, current_account)
-      def destroy(_record, _current_account), do: false
+      def destroy(_resoure, _current_account), do: false
 
       def permitted_params(current_account), do: permitted_params(nil, current_account)
-      def permitted_params(_record, _current_account), do: []
+      def permitted_params(_resoure, _current_account), do: []
 
       def accessible_attributes(current_account), do: accessible_attributes(nil, current_account)
-      def accessible_attributes(_record, _current_account), do: []
+      def accessible_attributes(_resoure, _current_account), do: []
 
-      def own_resource?(_record, _current_account), do: false
+      def own_resource?(_resoure, _current_account), do: false
 
       def admin?(_current_account), do: false
 
