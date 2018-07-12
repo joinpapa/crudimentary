@@ -126,12 +126,14 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
         unquote(action_name(name, action_type, options)),
         unquote(
           case action_type do
-          :index ->
-            result_name(name, :list)
-          :show ->
-            name
-          _ ->
-            result_name(name, :single)
+            :index ->
+              result_name(name, :list)
+
+            :show ->
+              name
+
+            _ ->
+              result_name(name, :single)
           end
         )
       ) do

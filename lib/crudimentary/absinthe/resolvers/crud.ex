@@ -82,7 +82,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
          resource <- repo.get_by(schema, id: args[:id]),
-         {:authorized, true} <- {:authorized, authorized?(policy, resource, current_account, :show)} do
+         {:authorized, true} <-
+           {:authorized, authorized?(policy, resource, current_account, :show)} do
       {:ok, resource}
     else
       {:authorized, _} -> {:error, :unauthorized}

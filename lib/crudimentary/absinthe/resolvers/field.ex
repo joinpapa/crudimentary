@@ -4,6 +4,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
       use CRUDimentary.Absinthe.Resolvers.Base
 
       def call(nil, _, _, _, _), do: raise(ArgumentError, message: "field can not be nil")
+
       def call(
             current_account,
             parent,
@@ -11,6 +12,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
             %{definition: %{schema_node: %{identifier: field}}} = resolution
           ) do
         policy = unquote(params[:policy]) || policy_module(parent.__struct__)
+
         if field in policy.accessible_attributes(parent, current_account) do
           try do
             call(field, current_account, parent, args, resolution)
