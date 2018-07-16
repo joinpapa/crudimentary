@@ -19,30 +19,30 @@ defmodule CRUDimentary.Policy do
         authorized?(action, nil, current_account)
       end
 
-      def authorized?(action, resoure, current_account) do
-        apply(__MODULE__, action, [resoure, current_account])
+      def authorized?(action, resource, current_account) do
+        apply(__MODULE__, action, [resource, current_account])
       end
 
       def index(current_account), do: index(nil, current_account)
-      def index(resoure, current_account), do: show(resoure, current_account)
+      def index(resource, current_account), do: show(resource, current_account)
 
       def show(current_account), do: show(nil, current_account)
-      def show(_resoure, _current_account), do: false
+      def show(_resource, _current_account), do: false
 
       def create(current_account), do: create(nil, current_account)
-      def create(_resoure, _current_account), do: false
+      def create(_resource, _current_account), do: false
 
       def update(current_account), do: update(nil, current_account)
-      def update(_resoure, _current_account), do: false
+      def update(_resource, _current_account), do: false
 
       def destroy(current_account), do: destroy(nil, current_account)
-      def destroy(_resoure, _current_account), do: false
+      def destroy(_resource, _current_account), do: false
 
       def permitted_params(current_account), do: permitted_params(nil, current_account)
-      def permitted_params(_resoure, _current_account), do: []
+      def permitted_params(_resource, _current_account), do: []
 
       def accessible_attributes(current_account), do: accessible_attributes(nil, current_account)
-      def accessible_attributes(_resoure, _current_account), do: []
+      def accessible_attributes(_resource, _current_account), do: []
 
       defoverridable scope: 3,
                      index: 2,
