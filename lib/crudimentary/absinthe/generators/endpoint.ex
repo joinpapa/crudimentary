@@ -130,7 +130,7 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
               result_name(name, :list)
 
             :show ->
-              name
+              result_name(name, :list)
 
             _ ->
               result_name(name, :single)
