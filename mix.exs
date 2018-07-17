@@ -25,13 +25,13 @@ defmodule CRUDimentary.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.16"},
-      {:odgn_json_pointer, "~> 2.3"},
-      {:inflex, "~> 1.10.0"},
-      {:paginator, "~> 0.3"},
-      {:phoenix, ">= 0.0.0"},
       {:absinthe, "~> 1.4"},
-      {:guardian, "~> 1.0"}
+      {:ex_doc, "~> 0.16"},
+      {:guardian, "~> 1.0"},
+      {:inflex, "~> 1.10.0"},
+      {:odgn_json_pointer, "~> 2.3"},
+      {:paginator, "~> 0.3"},
+      {:phoenix, ">= 0.0.0"}
     ]
   end
 end
