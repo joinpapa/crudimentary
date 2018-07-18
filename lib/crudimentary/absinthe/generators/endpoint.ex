@@ -129,9 +129,6 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
             :index ->
               result_name(name, :list)
 
-            :show ->
-              result_name(name, :single)
-
             _ ->
               result_name(name, :single)
           end
