@@ -208,7 +208,7 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
 
   @doc false
   def excluded?(action, options) do
-    exclusions = options[:exclude] || []
+    exclusions = options[:except] || options[:exclude] || []
     included = options[:only] || []
 
     !Enum.member?(included, action) || Enum.member?(exclusions, action)
