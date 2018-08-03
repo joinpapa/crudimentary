@@ -6,11 +6,11 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
   def paginate(queriable, sortings, pagination, repo, options \\ []) do
     {direction, _} = (sort_list(sortings) |> List.first())
 
-    options =
+    opts =
       [
         include_total_count: true,
         cursor_fields: cursor_fields_from_sortings(sortings),
-        limit: cap_pagination_limit(pagination[:limit]),
+        limit: cap_pagination_limit(pagination[:limit], options),
         after: pagination[:after_cursor],
         before: pagination[:before_cursor],
         sort_direction: direction
@@ -18,7 +18,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
       |> Keyword.delete(:after, nil)
       |> Keyword.delete(:before, nil)
 
-    repo.paginate(queriable, options)
+    repo.paginate(queriable, opts)
   end
 
   def cursor_fields_from_sortings(sortings) do
