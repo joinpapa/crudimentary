@@ -27,7 +27,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
     end) ++ [:inserted_at]
   end
 
-  def cap_pagination_limit(limit, options \\ []) when is_integer(limit) do
+  def cap_pagination_limit(limit, options \\ [])
+  def cap_pagination_limit(limit, options) when is_integer(limit) do
     max = options[:max_page_size] || 50
 
     cond do
@@ -36,7 +37,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
       true -> limit
     end
   end
-  def cap_pagination_limit(_, options \\ []) do
+  def cap_pagination_limit(_, options) do
     options[:default_page_size] || 30
   end
 end
