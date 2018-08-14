@@ -44,17 +44,16 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
   def format_pagination(_), do: nil
 
   def apply_mapping(data, nil), do: data
-  def apply_mapping(data, mapping) when is_list(mapping) do
+  def apply_mapping(data, mapping) when is_map(mapping) do
     Enum.map(data, &apply_mapping(&1, mapping))
   end
   def apply_mapping(data, mapping) do
     string_data = CRUDimentary.Absinthe.Services.Map.StringifyKeys.call(data)
 
-    Enum.reduce(mapping, data, fn {attribute, json_pointer}, object ->
-      case JSONPointer.get(string_data, json_pointer) do
+    Enum.reduce(mapping, data, fn {map_from, map_to}, object ->
+      case JSONPointer.get(string_data, map_from) do
         {:ok, value} ->
-          Map.put(object, attribute, value)
-
+          JSONPointer.set!(object, map_to, value)
         {:error, _} ->
           object
       end
