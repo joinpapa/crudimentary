@@ -45,20 +45,19 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
 
   def apply_mapping(data, nil), do: data
   def apply_mapping(data, mapping) when is_map(mapping) do
-    Enum.map(data, &apply_mapping(&1, mapping))
-  end
-  def apply_mapping(data, mapping) do
     string_data = CRUDimentary.Absinthe.Services.Map.StringifyKeys.call(data)
 
     Enum.reduce(mapping, data, fn {map_from, map_to}, object ->
       case JSONPointer.get(string_data, map_from) do
         {:ok, value} ->
+          JSONPointer.remove(object, map_from)
           JSONPointer.set!(object, map_to, value)
         {:error, _} ->
           object
       end
     end)
   end
+  def apply_mapping(data, _), do: data
 
   def data_load(data) when is_list(data), do: Enum.map(data, &data_load/1)
   def data_load(data), do: data
