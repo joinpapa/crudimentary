@@ -129,9 +129,6 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
             :index ->
               result_name(name, :list)
 
-            :show ->
-              name
-
             _ ->
               result_name(name, :single)
           end
@@ -211,8 +208,12 @@ defmodule CRUDimentary.Absinthe.Generator.Endpoint do
 
   @doc false
   def excluded?(action, options) do
-    exclusions = options[:exclude] || []
-    Enum.any?(exclusions, &(&1 == action))
+    exclusions = options[:except] || options[:exclude] || []
+    included = options[:only] || []
+
+    Enum.member?(exclusions, action) || (
+      Enum.any?(included) && !Enum.member?(included, action)
+    )
   end
 
   @doc false

@@ -27,5 +27,12 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
     end
   end
 
-  def return_field(struct, field), do: {:ok, Map.from_struct(struct)[field]}
+  def return_field(struct, field) do
+    {:ok,
+      case struct do
+        %_{} -> Map.from_struct(struct)[field]
+        _ -> struct[field]
+      end
+    }
+  end
 end

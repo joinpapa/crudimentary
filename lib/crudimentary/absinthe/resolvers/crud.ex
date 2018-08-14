@@ -29,7 +29,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
 
           apply(unquote(__MODULE__), action, params)
         else
-          raise(ArgumentError, message: "unknown action #{action}")
+          raise(ArgumentError, message: "unknown action '#{action}'")
         end
       end
     end
@@ -56,7 +56,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
       |> scope(current_account, parent, policy)
       |> filter(args[:filter], options[:mapping], options[:filters])
       |> sort(args[:sorting])
-      |> paginate(args[:sorting], args[:pagination], repo)
+      |> paginate(args[:sorting], args[:pagination], repo, options[:pagination])
       |> result(options[:mapping])
     else
       {:authorized, _} -> {:error, :unauthorized}
@@ -84,7 +84,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
          resource <- repo.get_by(schema, id: args[:id]),
          {:authorized, true} <-
            {:authorized, authorized?(policy, resource, current_account, :show)} do
-      {:ok, resource}
+      result(resource)
     else
       {:authorized, _} -> {:error, :unauthorized}
       {:error, _, changeset, _} -> {:error, changeset}
