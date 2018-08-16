@@ -108,7 +108,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
   def create(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
-         {:input, %{} = input} <- args[:input],
+         {:input, %{} = input} <- {:input, args[:input]},
          {:authorized, true} <- {:authorized, authorized?(policy, current_account, :create)},
          params <-
            apply_mapping(input, options[:mapping])
@@ -144,7 +144,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
         ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
   def update(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
-         {:input, %{} = input} <- args[:input],
+         {:input, %{} = input} <- {:input, args[:input]},
          {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
          policy <- options[:policy] || policy_module(schema),
          {:authorized, true} <-
