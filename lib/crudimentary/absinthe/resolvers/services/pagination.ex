@@ -4,7 +4,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
   import CRUDimentary.Absinthe.Resolvers.Services.Querying, only: [sort_list: 1]
 
   def paginate(queriable, sortings, pagination, repo, options \\ []) do
-    {direction, _} = (sort_list(sortings) |> List.first())
+    {direction, _} = sort_list(sortings) |> List.first()
 
     opts =
       [
@@ -28,6 +28,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
   end
 
   def cap_pagination_limit(limit, options \\ [])
+
   def cap_pagination_limit(limit, options) when is_integer(limit) do
     max = options[:max_page_size] || 50
 
@@ -37,6 +38,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
       true -> limit
     end
   end
+
   def cap_pagination_limit(_, options) do
     options[:default_page_size] || 30
   end

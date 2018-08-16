@@ -49,6 +49,10 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
     add_if_member(map, key, value, permitted_params)
   end
 
+  defp add_if_member(map, key, value, list) when is_binary(key) do
+    add_if_member(map, String.to_atom(key), value, list)
+  end
+
   defp add_if_member(map, key, value, list) do
     if Enum.member?(list, key) do
       Map.put(map, key, value)
