@@ -108,9 +108,10 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
   def create(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
          policy <- options[:policy] || policy_module(schema),
+         {:input, %{} = input} <- args[:input],
          {:authorized, true} <- {:authorized, authorized?(policy, current_account, :create)},
          params <-
-           apply_mapping(args[:input], options[:mapping])
+           apply_mapping(input, options[:mapping])
            |> permitted_params(current_account, policy),
          changeset <-
            apply(
@@ -122,6 +123,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
       result(resource)
     else
       {:authorized, _} -> {:error, :unauthorized}
+      {:input, nil} -> {:error, :missing_input_field}
       {:error, _, changeset, _} -> {:error, changeset}
       {:error, error} -> {:error, error}
       error -> {:error, error}
@@ -142,12 +144,13 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
         ) :: {:ok, %{data: map, pagination: ResultFormatter.pagination_result()}} | {:error, any}
   def update(schema, current_account, _parent, args, _resolution, options \\ []) do
     with repo <- options[:repo] || @repo,
+         {:input, %{} = input} <- args[:input],
          {:resource, %schema{} = resource} <- {:resource, repo.get(schema, args[:id])},
          policy <- options[:policy] || policy_module(schema),
          {:authorized, true} <-
            {:authorized, authorized?(policy, resource, current_account, :update)},
          params <-
-           apply_mapping(args[:input], options[:mapping])
+           apply_mapping(input, options[:mapping])
            |> permitted_params(current_account, policy),
          changeset <-
            apply(
@@ -159,6 +162,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
       result(updated_resource)
     else
       {:authorized, _} -> {:error, :unauthorized}
+      {:input, nil} -> {:error, :missing_input_field}
       {:resource, _} -> {:error, :no_resource}
       {:error, _, changeset, _} -> {:error, changeset}
       {:error, error} -> {:error, error}
