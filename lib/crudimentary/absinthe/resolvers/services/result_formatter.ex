@@ -64,6 +64,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
           object
       end
     end)
+    |> CRUDimentary.Absinthe.Services.Map.AtomizeKeys.call()
   end
 
   def apply_mapping(data, _), do: data
