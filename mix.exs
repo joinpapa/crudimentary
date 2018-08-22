@@ -31,7 +31,8 @@ defmodule CRUDimentary.MixProject do
       {:inflex, "~> 1.10.0"},
       {:odgn_json_pointer, "~> 2.3"},
       {:paginator, "~> 0.3"},
-      {:phoenix, ">= 0.0.0"}
+      {:phoenix, ">= 0.0.0"},
+      {:confex, "~> 3.3.1"}
     ]
   end
 end
