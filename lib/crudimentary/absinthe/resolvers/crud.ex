@@ -6,7 +6,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.CRUD do
     Pagination
   }
 
-  @repo  Confex.get_env(CRUDimentary.MixProject.project()[:app], :repo)
+  @repo Confex.get_env(CRUDimentary.MixProject.project()[:app], :repo)
 
   defmacro __using__(params) do
     quote do
