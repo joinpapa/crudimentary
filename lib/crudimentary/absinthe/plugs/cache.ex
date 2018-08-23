@@ -1,4 +1,4 @@
-defmodule CRUDimentary.Absinthe.Plugs.Context do
+defmodule CRUDimentary.Absinthe.Plugs.Cache do
   @moduledoc """
   Plug for issuing cache during response creation.
   This plug creates temporary cache storage uppon incoming request, cache (GenServer) pid is stored in Absinthe Resolution Context.
@@ -23,15 +23,19 @@ defmodule CRUDimentary.Absinthe.Plugs.Context do
         _ -> nil
       end
 
+    context =
+      if conn.private[:absinthe] do
+        Map.merge(conn.private.absinthe.context, %{cache: cache})
+      else
+        %{cache: cache}
+      end
+
     conn =
       put_private(
         conn,
         :absinthe,
         %{
-          context: %{
-            cache: cache,
-            current_account: Guardian.Plug.current_resource(conn)
-          }
+          context: context
         }
       )
 
