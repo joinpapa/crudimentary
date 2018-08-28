@@ -14,7 +14,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
         with policy when not is_nil(policy) <-
                unquote(params[:policy]) || policy_module(parent.__struct__),
              true <- field in policy.accessible_attributes(parent, current_account),
-             external_resolver <- get_external_resolver(field),
+             external_resolver <- unquote(__MODULE__).get_external_resolver(field),
              {:external, true} <- {:external, Code.ensure_compiled?(external_resolver)} do
           external_resolver.call(current_account, parent, args, resolution)
         else
