@@ -33,9 +33,9 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
     end
   end
 
-  def field_resolver_module(atom) do
+  def get_external_resolver(field) do
     submodule =
-      atom
+      field
       |> Atom.to_string()
       |> Macro.camelize()
 
