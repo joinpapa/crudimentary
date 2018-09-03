@@ -11,20 +11,35 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
             args,
             %{definition: %{schema_node: %{identifier: field}}} = resolution
           ) do
-        policy = unquote(params[:policy]) || policy_module(parent.__struct__)
-
-        if field in policy.accessible_attributes(parent, current_account) do
-          try do
-            call(field, current_account, parent, args, resolution)
-          rescue
-            FunctionClauseError ->
-              unquote(__MODULE__).return_field(parent, field)
-          end
+        with policy when not is_nil(policy) <-
+               unquote(params[:policy]) || policy_module(parent.__struct__),
+             true <- field in policy.accessible_attributes(parent, current_account),
+             external_resolver <- unquote(__MODULE__).get_external_resolver(field),
+             {:external, true} <- {:external, Code.ensure_compiled?(external_resolver)} do
+          external_resolver.call(current_account, parent, args, resolution)
         else
-          {:ok, nil}
+          {:external, false} ->
+            try do
+              call(field, current_account, parent, args, resolution)
+            rescue
+              FunctionClauseError ->
+                unquote(__MODULE__).return_field(parent, field)
+            end
+
+          _ ->
+            {:ok, nil}
         end
       end
     end
+  end
+
+  def get_external_resolver(field) do
+    submodule =
+      field
+      |> Atom.to_string()
+      |> Macro.camelize()
+
+    Module.concat([__MODULE__, submodule])
   end
 
   def return_field(struct, field) do
