@@ -1,10 +1,12 @@
-defmodule CertifyEdWeb.API.Middleware.Default do
+defmodule CRUDimentary.Absinthe.Middlewares.Default do
   def call(%{source: source} = resolution, %{field: field, object: object}) do
     value =
-      with %_{} <- source,
-           false <- String.ends_with?(object.name, "Result"),
-           object_resolver when not is_nil(object_resolver) <- extract_object_resolver(object),
-           {:ok, value} <- object_resolver.(source, field.args, resolution) do
+      with \
+        %_{} <- source,
+        false <- String.ends_with?(object.name, "Result"),
+        object_resolver when not is_nil(object_resolver) <- extract_object_resolver(object),
+        {:ok, value} <- object_resolver.(source, field.args, resolution)
+      do
         value
       else
         _ -> Map.get(source, field.identifier)
