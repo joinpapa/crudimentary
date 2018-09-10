@@ -21,18 +21,18 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Querying do
     end
   end
 
-  def filter(queriable, filters, mapping \\ %{}, custom_filters \\ %{}) do
+  def filter(queryable, filters, mapping \\ %{}, custom_filters \\ %{}) do
     CRUDimentary.Ecto.Filter.call(
-      queriable,
+      queryable,
       filters,
       mapping,
       custom_filters
     )
   end
 
-  def sort(queriable, sortings) do
+  def sort(queryable, sortings) do
     sorting = sort_list(sortings)
-    order_by(queriable, ^sorting)
+    order_by(queryable, ^sorting)
   end
 
   def sort_list(sortings) do

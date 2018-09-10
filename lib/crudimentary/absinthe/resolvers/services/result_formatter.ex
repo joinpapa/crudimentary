@@ -10,7 +10,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
           total_count: integer
         }
 
-  def result(queriable, mapping \\ nil)
+  def result(queryable, mapping \\ nil)
 
   def result({:error, _, error, _}, _) do
     {:error, error}
@@ -20,22 +20,22 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.ResultFormatter do
     {:error, error}
   end
 
-  def result({:ok, queriable}, mapping) do
-    result(queriable, mapping)
+  def result({:ok, queryable}, mapping) do
+    result(queryable, mapping)
   end
 
-  def result(%{entries: queriable, metadata: metadata}, mapping) do
+  def result(%{entries: queryable, metadata: metadata}, mapping) do
     {
       :ok,
       %{
-        data: queriable |> apply_mapping(mapping) |> data_load(),
+        data: queryable |> apply_mapping(mapping) |> data_load(),
         pagination: format_pagination(metadata)
       }
     }
   end
 
-  def result(queriable, mapping) do
-    {:ok, %{data: queriable |> apply_mapping(mapping)}}
+  def result(queryable, mapping) do
+    {:ok, %{data: queryable |> apply_mapping(mapping)}}
   end
 
   def format_pagination(%Metadata{} = pagination) do

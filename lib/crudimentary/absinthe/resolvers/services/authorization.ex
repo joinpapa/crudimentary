@@ -14,8 +14,8 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Authorization do
     policy.authorized?(action, record, account)
   end
 
-  def policy_module(%Ecto.Query{} = queriable) do
-    {_, schema} = Ecto.Queryable.to_query(queriable).from
+  def policy_module(%Ecto.Query{} = queryable) do
+    {_, schema} = Ecto.Queryable.to_query(queryable).from
     policy_module(schema)
   end
 

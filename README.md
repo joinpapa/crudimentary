@@ -4,7 +4,7 @@
 ##### TODO: HEX DOCS
 -------------------------
 
-Absinthe helper for queriable CRUD resource endpoints (queries and mutations).
+Absinthe helper for queryable CRUD resource endpoints (queries and mutations).
 
 This package contains set of field generators for Absinthe including generic resolvers for sorting, filtering and pagination of output data which removes much of repeatative boilerplate code. Also includes policy and caching mechanism.
 
@@ -114,12 +114,12 @@ Policy is defined set of functions which regulate scope of access and action exe
 defmodule ProjectWeb.API.Resolvers.Account.Policy do
   use CRUDimentary.Policy
 
-  def scope(queriable, _current_account) do
+  def scope(queryable, _current_account) do
     if Code.ensure_compiled?(Ecto.Query) do
       import Ecto.Query
-      from(r in queriable)
+      from(r in queryable)
     else
-      queriable
+      queryable
     end
   end
 

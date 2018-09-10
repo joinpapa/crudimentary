@@ -1,9 +1,9 @@
 defmodule CRUDimentary.Ecto.Filter do
   import Ecto.Query
 
-  def call(queriable, [], _, _), do: queriable
+  def call(queryable, [], _, _), do: queryable
 
-  def call(queriable, filters, mapping, custom_filters) when is_list(filters) do
+  def call(queryable, filters, mapping, custom_filters) when is_list(filters) do
     dynamic =
       Enum.reduce(
         filters,
@@ -12,12 +12,12 @@ defmodule CRUDimentary.Ecto.Filter do
       )
 
     from(
-      queriable,
+      queryable,
       where: ^dynamic
     )
   end
 
-  def call(queriable, _, _, _), do: queriable
+  def call(queryable, _, _, _), do: queryable
 
   defp build_filter(filter_input, dynamic, mapping, filters) do
     dynamic(

@@ -6,12 +6,12 @@ defmodule CRUDimentary.Policy do
 
   defmacro __using__(_) do
     quote do
-      def scope(queriable, _current_account, _parent) do
+      def scope(queryable, _current_account, _parent) do
         if Code.ensure_compiled?(Ecto.Query) do
           import Ecto.Query
-          from(r in queriable, where: 1 == 0)
+          from(r in queryable, where: 1 == 0)
         else
-          queriable
+          queryable
         end
       end
 

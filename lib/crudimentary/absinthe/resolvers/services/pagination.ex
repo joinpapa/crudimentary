@@ -3,7 +3,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
 
   import CRUDimentary.Absinthe.Resolvers.Services.Querying, only: [sort_list: 1]
 
-  def paginate(queriable, sortings, pagination, repo, options \\ []) do
+  def paginate(queryable, sortings, pagination, repo, options \\ []) do
     {direction, _} = sort_list(sortings) |> List.first()
 
     opts =
@@ -18,7 +18,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
       |> Keyword.delete(:after, nil)
       |> Keyword.delete(:before, nil)
 
-    repo.paginate(queriable, opts)
+    repo.paginate(queryable, opts)
   end
 
   def cursor_fields_from_sortings(sortings) do
