@@ -5,7 +5,7 @@ defmodule CRUDimentary.Absinthe.Middlewares.Default do
         %_{} <- source,
         false <- String.ends_with?(object.name, "Result"),
         object_resolver when not is_nil(object_resolver) <- extract_object_resolver(object),
-        {:ok, value} <- object_resolver.(source, field.args, resolution)
+        {:ok, value} <- object_resolver.(source, resolution.definition.argument_data, resolution)
       do
         value
       else
