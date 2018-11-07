@@ -13,7 +13,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Field do
           )
       do
         with \
-          {:struct, %_{}} <- parent,
+          {:struct, %_{}} <- {:struct, parent},
           policy when not is_nil(policy) <-
             unquote(params[:policy]) || policy_module(parent.__struct__),
           true <- field in policy.accessible_attributes(parent, current_account),
