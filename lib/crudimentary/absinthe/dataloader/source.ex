@@ -1,4 +1,4 @@
-defmodule CertifyEdWeb.API.Graphql.Dataloader.Source do
+defmodule CRUDimentary.Absinthe.Dataloader.Source do
   import Ecto.Query
 
   @repo Confex.get_env(CRUDimentary.MixProject.project()[:app], :repo)
