@@ -9,6 +9,9 @@ defmodule CRUDimentary.Absinthe.Middlewares.Default do
 
         {:middleware, module, opts} ->
           add_resolution_middlware(resolution, {module, opts})
+
+        {:error, value} ->
+          add_resolution_value(resolution, nil)
       end
     else
       _ ->
