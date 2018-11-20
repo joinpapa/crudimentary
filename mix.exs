@@ -4,7 +4,7 @@ defmodule CRUDimentary.MixProject do
   def project do
     [
       app: :crudimentary,
-      version: "0.2.3",
+      version: "0.2.4",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -29,7 +29,7 @@ defmodule CRUDimentary.MixProject do
       {:ex_doc, "~> 0.16"},
       {:inflex, "~> 1.10.0"},
       {:odgn_json_pointer, "~> 2.3"},
-      {:paginator, "~> 0.3"},
+      {:paginator, "~> 0.6.0"},
       {:phoenix, ">= 0.0.0"},
       {:confex, "~> 3.3.1"},
       {:dataloader, "~> 1.0.4"}
