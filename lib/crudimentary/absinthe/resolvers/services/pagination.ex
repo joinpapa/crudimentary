@@ -24,7 +24,7 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
   def cursor_fields_from_sortings(sortings) do
     Enum.map(sortings || [], fn {key, _} ->
       String.to_atom("#{key}")
-    end) ++ [:inserted_at]
+    end) ++ [:id, :inserted_at]
   end
 
   def cap_pagination_limit(limit, options \\ [])
