@@ -35,9 +35,7 @@ defmodule Crudimentary.Absinthe.Dataloader do
 
   defp callback(result, parent, args) when is_list(result) do
     if args[:pagination] do
-      total_count = Pagination.total_count(parent, args)
-      page = Paginator.paginate(result, args.pagination)
-      Map.put(page, :metadata, Map.put(page.metadata, :total_count, total_count))
+      Pagination.paginate(result, args.pagination)
     else
       result
     end
@@ -65,12 +63,6 @@ defmodule Crudimentary.Absinthe.Dataloader do
     |> Map.put(:assoc, assoc)
     |> Map.put(:type, type)
     |> Map.put(:policy, policy)
-    |> Map.put(:pagination, configure_pagination(args[:sorting], args[:pagination], args[:options][:pagination]))
-  end
-
-  defp configure_pagination(sorting, pagination) do
-    sorting
-    |> Pagination.create_opts(pagination)
-    |> Paginator.Config.new()
+    |> Map.put(:pagination, Pagination.create_pagination_config(args[:sorting], args[:pagination], args[:options][:pagination]))
   end
 end

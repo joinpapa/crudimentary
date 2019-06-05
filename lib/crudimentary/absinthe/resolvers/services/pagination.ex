@@ -3,6 +3,12 @@ defmodule CRUDimentary.Absinthe.Resolvers.Services.Pagination do
 
   import CRUDimentary.Absinthe.Resolvers.Services.Querying, only: [sort_list: 1]
 
+  def create_pagination_config(sorting, pagination, opts) do
+    sorting
+    |> Pagination.create_opts(pagination)
+    |> Paginator.Config.new()
+  end
+
   def paginate(queryable, sortings, pagination, repo, options \\ []) do
     opts = create_opts(sortings, pagination, options)
     repo.paginate(queryable, opts)
