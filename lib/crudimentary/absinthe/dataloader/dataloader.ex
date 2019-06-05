@@ -1,4 +1,4 @@
-defmodule Crudimentary.Absinthe.Dataloader do
+defmodule CRUDimentary.Absinthe.Dataloader do
   import Absinthe.Resolution.Helpers, only: [dataloader: 3]
 
   alias CRUDimentary.Absinthe.Resolvers.Services.{
@@ -7,22 +7,24 @@ defmodule Crudimentary.Absinthe.Dataloader do
     ResultFormatter
   }
 
-  alias __MODULE__.Source.{Show, Index}
+  alias __MODULE__.Sources.{Show, Index}
+
+  @repo Confex.get_env(CRUDimentary.MixProject.project()[:app], :repo)
 
   def batch(type, assoc, account, parent, args, resolution) do
     with \
       {:type_valid, true} <- {:type_valid, type in [:show, :index]},
       {:policy_valid, true} <- {:policy_valid, (type == :index and args[:policy] != nil) or type == :show},
-      {:args, args} <- {:args, build_args(args, account, assoc, type, parent, args[:policy])}
+      {:args, args} <- {:args, build_args(args, account, assoc, type, args[:policy])}
     do
       if type == :index do
         if Authorization.authorized?(args.policy, args.account, :index) do
-          dataloader(IndexSource, assoc, callback: &callback/3).(parent, args, resolution)
+          dataloader(Index, assoc, callback: &callback/3).(parent, args, resolution)
         else
           ResultFormatter.result(nil)
         end
       else
-        dataloader(ShowSource, assoc, callback: &callback/3).(parent, args, resolution)
+        dataloader(Show, assoc, callback: &callback/3).(parent, args, resolution)
       end
     else
       {:type_valid, false} ->
@@ -34,8 +36,12 @@ defmodule Crudimentary.Absinthe.Dataloader do
   end
 
   defp callback(result, parent, args) when is_list(result) do
+    repo = args[:repo] || @repo
+
     if args[:pagination] do
-      Pagination.paginate(result, args.pagination)
+      parent
+      |> Ecto.assoc(args[:assoc])
+      |> Pagination.enum_paginate(repo, result, args.pagination)
     else
       result
     end
@@ -57,7 +63,7 @@ defmodule Crudimentary.Absinthe.Dataloader do
 
   defp callback(result, _parent, _args), do: ResultFormatter.result(result)
 
-  defp build_args(args, account, assoc, type, parent, policy) do
+  defp build_args(args, account, assoc, type, policy) do
     args
     |> Map.put(:account, account)
     |> Map.put(:assoc, assoc)

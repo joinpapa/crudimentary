@@ -1,6 +1,4 @@
 defmodule CRUDimentary.Absinthe.Dataloader.Sources.Index do
-  import Ecto.Query
-
   alias CRUDimentary.Absinthe.Resolvers.Services.Querying
 
   @repo Confex.get_env(CRUDimentary.MixProject.project()[:app], :repo)
